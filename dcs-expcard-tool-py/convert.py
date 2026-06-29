@@ -677,24 +677,47 @@ def convert_sheet(file_path, sheet_index=0, mode='old'):
     return converter.convert(file_path, sheet_index)
 
 
+def convert_all_sheets(file_path, mode='old'):
+    """合并所有sheet页输出，每个sheet页为一级标题"""
+    import openpyxl
+    wb = openpyxl.load_workbook(file_path)
+    all_output = []
+
+    for i, ws in enumerate(wb.worksheets):
+        sheet_name = ws.title
+        result = convert_sheet(file_path, i, mode)
+        if result.strip():
+            all_output.append(f'# {sheet_name}\n')
+            all_output.append(result)
+            all_output.append('')
+
+    return '\n'.join(all_output)
+
+
 if __name__ == '__main__':
     import sys
 
     if len(sys.argv) < 3:
-        print("Usage: python convert.py <mode> <excel_file> [sheet_index]")
+        print("Usage: python convert.py <mode> <excel_file> [sheet_index|all]")
         print("  mode: old | new")
+        print("  sheet_index: 0-based index, or 'all' for all sheets")
         sys.exit(1)
 
     mode = sys.argv[1]
     file_path = sys.argv[2]
-    sheet_index = int(sys.argv[3]) if len(sys.argv) > 3 else 0
+    sheet_param = sys.argv[3] if len(sys.argv) > 3 else '0'
 
     if mode not in ('old', 'new'):
         print(f"Error: Unknown mode '{mode}'. Use 'old' or 'new'.")
         sys.exit(1)
 
     try:
-        result = convert_sheet(file_path, sheet_index, mode)
+        if sheet_param == 'all':
+            result = convert_all_sheets(file_path, mode)
+        else:
+            sheet_index = int(sheet_param)
+            result = convert_sheet(file_path, sheet_index, mode)
+
         with open('output.md', 'w', encoding='utf-8') as f:
             f.write(result)
         print("Done! Output written to output.md")
