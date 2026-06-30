@@ -20,10 +20,10 @@ class DCSConverter {
       或取反: "或取反",
     };
 
-    // 特殊分隔符字典: 键为特殊分隔符的值, 值为处理方式描述
+    // 特殊分隔符字典: 键为特殊分隔符的值, 值为转换后的默认逻辑分隔符
     this.SPECIAL_SEPARATORS = {
-      或延时: "或",
-      与延时: "与",
+      '或延时': '或',
+      '与延时': '与',
     };
 
     // 所有可能的逻辑分隔符
@@ -54,13 +54,24 @@ class DCSConverter {
   }
 
   _is_special_separator(text, rowIndex = null, colIndex = null) {
-    if (text in this.SPECIAL_SEPARATORS) {
-      if (rowIndex !== null && colIndex !== null) {
-        this.special_separator_positions.add([rowIndex, colIndex]);
+    if (!text) return null;
+    
+    // 遍历字典，检查文本是否以特殊分隔符开头
+    for (const [key, value] of Object.entries(this.SPECIAL_SEPARATORS)) {
+      if (text.startsWith(key)) {
+        // 只有当行列号都是有效整数时才记录位置
+        if (rowIndex !== null && colIndex !== null) {
+          const row = parseInt(rowIndex);
+          const col = parseInt(colIndex);
+          if (!isNaN(row) && !isNaN(col)) {
+            this.special_separator_positions.add([row, col]);
+          }
+        }
+        // 返回转换后的逻辑分隔符
+        return value;
       }
-      return true;
     }
-    return false;
+    return null;
   }
 
   _process_row(row, all_rows, index) {
@@ -165,9 +176,13 @@ class DCSConverter {
   }
 
   _process_level1(a, b, c, row, all_rows, index, useSeqNum = false) {
-    // 先检测特殊分隔符
+    // 先检测特殊分隔符，获取转换后的值
+    let b_converted = b;
     if (b) {
-      this._is_special_separator(b, index, 1);
+      const special_result = this._is_special_separator(b, index, 1);
+      if (special_result) {
+        b_converted = special_result;
+      }
     }
 
     let has_children = false;
@@ -184,21 +199,21 @@ class DCSConverter {
 
     let content = this._get_content_from_row(row, 1);
     if (!content) {
-      content = b && !this._is_logic_separator(b) ? b : "";
+      content = b_converted && !this._is_logic_separator(b_converted) ? b_converted : "";
     }
 
     let logic_str = "";
     if (has_children && child_logic) {
-      if (this._is_logic_separator(b)) {
-        if (b !== this.current_sub_title_logic) {
-          logic_str = "（" + b + "）";
+      if (this._is_logic_separator(b_converted)) {
+        if (b_converted !== this.current_sub_title_logic) {
+          logic_str = "（" + b_converted + "）";
         }
       } else {
         logic_str = "（" + child_logic + "）";
       }
     }
 
-    if (b && b.includes("或取反")) {
+    if (b_converted && b_converted.includes("或取反")) {
       logic_str = "（或取反）";
     }
 
@@ -215,32 +230,49 @@ class DCSConverter {
     const d_val = row[3] || "";
     const e_val = row[4] || "";
 
-    // 先检测特殊分隔符
-    if (b_val) this._is_special_separator(b_val, index, 1);
-    if (c_val) this._is_special_separator(c_val, index, 2);
-    if (d_val) this._is_special_separator(d_val, index, 3);
-    if (e_val) this._is_special_separator(e_val, index, 4);
+    // 先检测特殊分隔符，获取转换后的值
+    let b_converted = b_val;
+    let c_converted = c_val;
+    let d_converted = d_val;
+    let e_converted = e_val;
 
-    const b_is_logic = this._is_logic_separator(b_val);
-    const c_is_logic = this._is_logic_separator(c_val);
-    const d_is_logic = this._is_logic_separator(d_val);
+    if (b_val) {
+      const special = this._is_special_separator(b_val, index, 1);
+      if (special) b_converted = special;
+    }
+    if (c_val) {
+      const special = this._is_special_separator(c_val, index, 2);
+      if (special) c_converted = special;
+    }
+    if (d_val) {
+      const special = this._is_special_separator(d_val, index, 3);
+      if (special) d_converted = special;
+    }
+    if (e_val) {
+      const special = this._is_special_separator(e_val, index, 4);
+      if (special) e_converted = special;
+    }
+
+    const b_is_logic = this._is_logic_separator(b_converted);
+    const c_is_logic = this._is_logic_separator(c_converted);
+    const d_is_logic = this._is_logic_separator(d_converted);
 
     // 情况1: C列和D列都是逻辑分隔符 → 三级条件处理
     if (c_is_logic && d_is_logic) {
-      this._process_level3_group(a, c_val, d_val, e_val, row, all_rows, index);
+      this._process_level3_group(a, c_converted, d_converted, e_converted, row, all_rows, index);
       return;
     }
 
     // 情况2: C列是逻辑分隔符，D列不是逻辑分隔符 → 二级分组
     if (c_is_logic && !d_is_logic) {
-      this._process_level2_group(a, c_val, d_val, row, all_rows, index);
+      this._process_level2_group(a, c_converted, d_converted, row, all_rows, index);
       return;
     }
 
     // 情况3: B列是逻辑分隔符
     if (b_is_logic) {
-      if (c_val && !c_is_logic) {
-        this.output.push("   - " + c_val);
+      if (c_converted && !c_is_logic) {
+        this.output.push("   - " + c_converted);
         return;
       }
       return;
@@ -517,9 +549,17 @@ class DCSConverter {
     const b = row[1] || "";
     const c = row[2] || "";
 
-    // 先检测特殊分隔符
-    if (b) this._is_special_separator(b, index, 1);
-    if (c) this._is_special_separator(c, index, 2);
+    // 先检测特殊分隔符，获取转换后的值
+    let b_converted = b;
+    let c_converted = c;
+    if (b) {
+      const special = this._is_special_separator(b, index, 1);
+      if (special) b_converted = special;
+    }
+    if (c) {
+      const special = this._is_special_separator(c, index, 2);
+      if (special) c_converted = special;
+    }
 
     // 检测下一行A列是否是x.y格式
     if (index + 1 < all_rows.length) {
@@ -527,7 +567,7 @@ class DCSConverter {
       if (this._is_sub_item(next_a)) {
         // 下一行是x.y格式 → old模式处理
         this.item_counter += 1;
-        this._process_level1(a, b, c, row, all_rows, index, true);
+        this._process_level1(a, b_converted, c_converted, row, all_rows, index, true);
         // 处理所有x.y子项
         let j = index + 1;
         while (j < all_rows.length) {
@@ -557,11 +597,11 @@ class DCSConverter {
     }
 
     // 下一行不是x.y格式 → new模式执行检测
-    const b_is_logic = this._is_logic_separator(b);
+    const b_is_logic = this._is_logic_separator(b_converted);
 
     // B列不是逻辑 → 一级（直接输出）
     if (!b_is_logic) {
-      const content = b || "";
+      const content = b_converted || "";
       this.item_counter += 1;
       this.output.push(this.item_counter + ". " + content);
       return;
@@ -571,7 +611,7 @@ class DCSConverter {
     this.item_counter += 1;
     const result = this._processNewLevel2(
       this.item_counter,
-      b,
+      b_converted,
       row,
       all_rows,
       index,
@@ -582,10 +622,14 @@ class DCSConverter {
   _processNewLevel2(itemNum, b_logic, row, all_rows, index) {
     const c = row[2] || "";
 
-    // 先检测特殊分隔符
-    if (c) this._is_special_separator(c, index, 2);
+    // 先检测特殊分隔符，获取转换后的值
+    let c_converted = c;
+    if (c) {
+      const special = this._is_special_separator(c, index, 2);
+      if (special) c_converted = special;
+    }
 
-    const c_is_logic = this._is_logic_separator(c);
+    const c_is_logic = this._is_logic_separator(c_converted);
 
     // 确定二级遍历范围
     const endIndex = this._findEndIndex(all_rows, index, 1);
@@ -597,37 +641,41 @@ class DCSConverter {
       const next_row = all_rows[j];
       const next_c = next_row[2] || "";
 
-      // 先检测特殊分隔符
-      if (next_c) this._is_special_separator(next_c, j, 2);
+      // 先检测特殊分隔符，获取转换后的值
+      let next_c_converted = next_c;
+      if (next_c) {
+        const special = this._is_special_separator(next_c, j, 2);
+        if (special) next_c_converted = special;
+      }
 
       if (j === index) {
         // 当前行：C列是逻辑 → 三级处理
         if (c_is_logic) {
           const level3Result = this._processNewLevel3(
             itemNum,
-            c,
+            c_converted,
             next_row,
             all_rows,
             j,
           );
           items.push(level3Result);
-        } else if (c) {
-          items.push(c);
+        } else if (c_converted) {
+          items.push(c_converted);
         }
       } else {
         // 后续行：C列是逻辑 → 三级处理
-        if (this._is_logic_separator(next_c)) {
+        if (this._is_logic_separator(next_c_converted)) {
           const level3Result = this._processNewLevel3(
             itemNum,
-            next_c,
+            next_c_converted,
             next_row,
             all_rows,
             j,
           );
           items.push(level3Result);
           this.processed_rows.add(j);
-        } else if (next_c) {
-          items.push(next_c);
+        } else if (next_c_converted) {
+          items.push(next_c_converted);
           this.processed_rows.add(j);
         }
       }
@@ -644,10 +692,14 @@ class DCSConverter {
   _processNewLevel3(itemNum, c_logic, row, all_rows, index) {
     const d = row[3] || "";
 
-    // 先检测特殊分隔符
-    if (d) this._is_special_separator(d, index, 3);
+    // 先检测特殊分隔符，获取转换后的值
+    let d_converted = d;
+    if (d) {
+      const special = this._is_special_separator(d, index, 3);
+      if (special) d_converted = special;
+    }
 
-    const d_is_logic = this._is_logic_separator(d);
+    const d_is_logic = this._is_logic_separator(d_converted);
 
     // 确定三级遍历范围
     const endIndex = this._findEndIndex(all_rows, index, 2);
@@ -659,37 +711,41 @@ class DCSConverter {
       const next_row = all_rows[j];
       const next_d = next_row[3] || "";
 
-      // 先检测特殊分隔符
-      if (next_d) this._is_special_separator(next_d, j, 3);
+      // 先检测特殊分隔符，获取转换后的值
+      let next_d_converted = next_d;
+      if (next_d) {
+        const special = this._is_special_separator(next_d, j, 3);
+        if (special) next_d_converted = special;
+      }
 
       if (j === index) {
         // 当前行：D列是逻辑 → 四级处理
         if (d_is_logic) {
           const level4Result = this._processNewLevel4(
             itemNum,
-            d,
+            d_converted,
             next_row,
             all_rows,
             j,
           );
           items.push(level4Result);
-        } else if (d) {
-          items.push(d);
+        } else if (d_converted) {
+          items.push(d_converted);
         }
       } else {
         // 后续行：D列是逻辑 → 四级处理
-        if (this._is_logic_separator(next_d)) {
+        if (this._is_logic_separator(next_d_converted)) {
           const level4Result = this._processNewLevel4(
             itemNum,
-            next_d,
+            next_d_converted,
             next_row,
             all_rows,
             j,
           );
           items.push(level4Result);
           this.processed_rows.add(j);
-        } else if (next_d) {
-          items.push(next_d);
+        } else if (next_d_converted) {
+          items.push(next_d_converted);
           this.processed_rows.add(j);
         }
       }
@@ -710,8 +766,12 @@ class DCSConverter {
   _processNewLevel4(itemNum, d_logic, row, all_rows, index) {
     const e = row[4] || "";
 
-    // 先检测特殊分隔符
-    if (e) this._is_special_separator(e, index, 4);
+    // 先检测特殊分隔符，获取转换后的值
+    let e_converted = e;
+    if (e) {
+      const special = this._is_special_separator(e, index, 4);
+      if (special) e_converted = special;
+    }
 
     // 确定四级遍历范围
     const endIndex = this._findEndIndex(all_rows, index, 3);
@@ -723,18 +783,22 @@ class DCSConverter {
       const next_row = all_rows[j];
       const next_e = next_row[4] || "";
 
-      // 先检测特殊分隔符
-      if (next_e) this._is_special_separator(next_e, j, 4);
+      // 先检测特殊分隔符，获取转换后的值
+      let next_e_converted = next_e;
+      if (next_e) {
+        const special = this._is_special_separator(next_e, j, 4);
+        if (special) next_e_converted = special;
+      }
 
       if (j === index) {
         // 当前行：E列内容
-        if (e && !this._is_logic_separator(e)) {
-          items.push(e);
+        if (e_converted && !this._is_logic_separator(e_converted)) {
+          items.push(e_converted);
         }
       } else {
         // 后续行：E列内容
-        if (next_e && !this._is_logic_separator(next_e)) {
-          items.push(next_e);
+        if (next_e_converted && !this._is_logic_separator(next_e_converted)) {
+          items.push(next_e_converted);
           this.processed_rows.add(j);
         }
       }

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1024'%3E%3Cpath fill='%236366f1' d='M819.2 187.733333H477.866667a17.066667 17.066667 0 0 0 0 34.133334h341.333333a17.066667 17.066667 0 0 0 0-34.133334zM819.2 324.266667H477.866667a17.066667 17.066667 0 0 0 0 34.133333h341.333333a17.066667 17.066667 0 0 0 0-34.133333zM819.2 460.8h-204.8a17.066667 17.066667 0 0 0 0 34.133333h204.8a17.066667 17.066667 0 0 0 0-34.133333zM819.2 597.333333h-136.533333a17.066667 17.066667 0 0 0 0 34.133334h136.533333a17.066667 17.066667 0 0 0 0-34.133334z'/%3E%3Cpath fill='%236366f1' d='M863.9488 34.133333H467.2512A126.020267 126.020267 0 0 0 341.333333 160.0512V204.8H160.0512A126.020267 126.020267 0 0 0 34.133333 330.717867v533.230933A126.020267 126.020267 0 0 0 160.0512 989.866667h396.6976A126.020267 126.020267 0 0 0 682.666667 863.9488V819.2h181.282133A126.020267 126.020267 0 0 0 989.866667 693.282133V160.0512A126.020267 126.020267 0 0 0 863.9488 34.133333z m85.265067 659.114667a85.367467 85.367467 0 0 1-85.265067 85.265067H467.2512a85.333333 85.333333 0 0 1-85.230933-85.265067v-8.977067c-13.858133 7.304533-26.965333 15.940267-39.150934 25.873067A125.781333 125.781333 0 0 0 467.2512 819.2h174.762667v44.714667a85.367467 85.367467 0 0 1-85.265067 85.265066H160.0512a85.333333 85.333333 0 0 1-85.230933-85.265066V330.683733a85.333333 85.333333 0 0 1 85.230933-85.230933v0.034133H341.333333v133.3248c13.277867-5.3248 26.862933-9.966933 40.686934-13.892266V160.017067a85.333333 85.333333 0 0 1 85.230933-85.230934v0.034134h396.6976a85.333333 85.333333 0 0 1 85.265067 85.230933V693.248z'/%3E%3Cpath fill='%236366f1' d='M562.926933 514.116267c0.682667-1.058133 1.604267-1.911467 2.048-3.072a20.718933 20.718933 0 0 0 1.604267-7.9872c0-0.3072-0.170667-0.546133-0.170667-0.853334 0-0.2048 0.136533-0.4096 0.1024-0.6144-0.034133-0.580267-0.443733-0.989867-0.546133-1.570133a19.899733 19.899733 0 0 0-10.103467-14.6432l-0.136533-0.1024-0.2048-0.1024c-0.7168-0.375467-1.3312-0.8192-2.082133-1.092267l-126.3616-66.935466a20.48 20.48 0 1 0-19.1488 36.215466l55.227733 29.252267h-5.700267a342.869333 342.869333 0 0 0-295.048533 169.506133 20.48 20.48 0 1 0 35.396267 20.650667 301.806933 301.806933 0 0 1 259.6864-149.230933h29.320533l-68.061867 52.872533a20.445867 20.445867 0 1 0 25.156267 32.324267l114.858667-89.224534c0.512-0.375467 0.682667-1.024 1.160533-1.467733 1.160533-1.1264 2.082133-2.525867 3.003733-3.925333z'/%3E%3C/svg%3E">
     <title>DCS Converter</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,28 +15,28 @@
         }
 
         :root, [data-theme="light"] {
-            --bg: #f8fafc;
-            --surface: #ffffff;
-            --border: #e2e8f0;
-            --text-primary: #0f172a;
-            --text-secondary: #64748b;
-            --text-muted: #94a3b8;
+            --bg: #eef1f6;
+            --surface: #f4f6f9;
+            --border: #dce2ea;
+            --text-primary: #2d3748;
+            --text-secondary: #5a6577;
+            --text-muted: #8e99a9;
             --primary: #6366f1;
             --primary-hover: #4f46e5;
-            --primary-light: #eef2ff;
+            --primary-light: #e8ecf5;
             --success: #10b981;
-            --success-light: #ecfdf5;
+            --success-light: #e6f7f0;
             --success-dark: #047857;
             --warning: #f59e0b;
-            --warning-light: #fffbeb;
+            --warning-light: #fef9e7;
             --warning-dark: #b45309;
-            --shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+            --shadow: 0 1px 4px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
             --radius: 12px;
             --radius-sm: 8px;
-            --md-text: #40464f;
+            --md-text: #3d4654;
             --md-primary: #4870ac;
-            --md-marker: #a2b6d4;
-            --md-block-bg: #f6f8fa;
+            --md-marker: #8da3c1;
+            --md-block-bg: #e8ecf3;
             --status-success-body: #065f46;
             --status-warning-body: #92400e;
         }
@@ -104,7 +105,7 @@
             gap: 8px;
         }
 
-        .sidebar-logo span {
+        .sidebar-logo-icon {
             color: var(--primary);
         }
 
@@ -501,11 +502,11 @@
 
         /* 大纲 - 树形结构 */
         .md-outline {
-            width: 200px;
+            width: 220px;
             flex-shrink: 0;
-            padding: 12px;
+            padding: 16px;
             overflow-y: auto;
-            background: var(--bg);
+            background: var(--surface);
             border-left: 1px solid var(--border);
         }
 
@@ -513,26 +514,36 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
             border-bottom: 1px solid var(--border);
         }
 
         .outline-title {
-            font-size: 11px;
+            font-size: 13px;
             font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .outline-title::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: var(--primary);
+            border-radius: 2px;
         }
 
         .outline-toggle-all {
-            padding: 2px 6px;
-            font-size: 10px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 500;
             color: var(--text-muted);
-            background: var(--surface);
+            background: var(--bg);
             border: 1px solid var(--border);
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.15s ease;
         }
@@ -540,6 +551,7 @@
         .outline-toggle-all:hover {
             color: var(--primary);
             border-color: var(--primary);
+            background: var(--primary-light);
         }
 
         .outline-tree {
@@ -549,45 +561,53 @@
         }
 
         .outline-tree-item {
-            margin-bottom: 2px;
+            margin-bottom: 4px;
         }
 
         .outline-tree-node {
             display: flex;
             align-items: center;
-            gap: 4px;
-            padding: 4px 6px;
-            border-radius: 4px;
+            gap: 6px;
+            padding: 8px 10px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.1s ease;
-            font-size: 12px;
+            transition: all 0.15s ease;
+            font-size: 13px;
             color: var(--text-secondary);
         }
 
         .outline-tree-node:hover {
-            background: var(--surface);
+            background: var(--bg);
             color: var(--text-primary);
         }
 
         .outline-tree-node.active {
             background: var(--primary-light);
             color: var(--primary);
+            font-weight: 500;
         }
 
         .outline-tree-toggle {
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 8px;
+            font-size: 10px;
             color: var(--text-muted);
-            transition: transform 0.15s ease;
+            background: var(--bg);
+            border-radius: 4px;
+            transition: all 0.15s ease;
             flex-shrink: 0;
+        }
+
+        .outline-tree-toggle:hover {
+            background: var(--border);
         }
 
         .outline-tree-toggle.expanded {
             transform: rotate(90deg);
+            color: var(--primary);
         }
 
         .outline-tree-toggle.hidden {
@@ -603,10 +623,13 @@
 
         .outline-tree-children {
             list-style: none;
-            padding-left: 16px;
+            padding-left: 12px;
             margin: 0;
             overflow: hidden;
             transition: max-height 0.2s ease;
+            border-left: 1px solid var(--border);
+            margin-left: 8px;
+            margin-top: 2px;
         }
 
         .outline-tree-children.collapsed {
@@ -615,10 +638,9 @@
 
         .outline-empty {
             color: var(--text-muted);
-            font-size: 11px;
-            font-style: italic;
+            font-size: 12px;
             text-align: center;
-            padding: 20px 0;
+            padding: 24px 0;
         }
 
         /* 底部状态栏 */
@@ -739,6 +761,53 @@
             color: var(--warning-dark);
         }
 
+        /* 位置标签样式 */
+        .status-card-locations {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .status-locations-label {
+            font-size: 11px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .status-card.success .status-locations-label {
+            color: var(--success-dark);
+        }
+
+        .status-card.warning .status-locations-label {
+            color: var(--warning-dark);
+        }
+
+        .status-location-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .status-location-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+        }
+
+        .status-card.success .status-location-tag {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--success-dark);
+        }
+
+        .status-card.warning .status-location-tag {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--warning-dark);
+        }
+
         .status-empty {
             display: flex;
             align-items: center;
@@ -832,7 +901,12 @@
     <div class="app-container">
         <div class="sidebar">
             <div class="sidebar-logo">
-                <span>◆</span> DCS Converter
+                <svg class="sidebar-logo-icon" viewBox="0 0 1024 1024" width="18" height="18">
+                    <path fill="currentColor" d="M819.2 187.733333H477.866667a17.066667 17.066667 0 0 0 0 34.133334h341.333333a17.066667 17.066667 0 0 0 0-34.133334zM819.2 324.266667H477.866667a17.066667 17.066667 0 0 0 0 34.133333h341.333333a17.066667 17.066667 0 0 0 0-34.133333zM819.2 460.8h-204.8a17.066667 17.066667 0 0 0 0 34.133333h204.8a17.066667 17.066667 0 0 0 0-34.133333zM819.2 597.333333h-136.533333a17.066667 17.066667 0 0 0 0 34.133334h136.533333a17.066667 17.066667 0 0 0 0-34.133334z"/>
+                    <path fill="currentColor" d="M863.9488 34.133333H467.2512A126.020267 126.020267 0 0 0 341.333333 160.0512V204.8H160.0512A126.020267 126.020267 0 0 0 34.133333 330.717867v533.230933A126.020267 126.020267 0 0 0 160.0512 989.866667h396.6976A126.020267 126.020267 0 0 0 682.666667 863.9488V819.2h181.282133A126.020267 126.020267 0 0 0 989.866667 693.282133V160.0512A126.020267 126.020267 0 0 0 863.9488 34.133333z m85.265067 659.114667a85.367467 85.367467 0 0 1-85.265067 85.265067H467.2512a85.333333 85.333333 0 0 1-85.230933-85.265067v-8.977067c-13.858133 7.304533-26.965333 15.940267-39.150934 25.873067A125.781333 125.781333 0 0 0 467.2512 819.2h174.762667v44.714667a85.367467 85.367467 0 0 1-85.265067 85.265066H160.0512a85.333333 85.333333 0 0 1-85.230933-85.265066V330.683733a85.333333 85.333333 0 0 1 85.230933-85.230933v0.034133H341.333333v133.3248c13.277867-5.3248 26.862933-9.966933 40.686934-13.892266V160.017067a85.333333 85.333333 0 0 1 85.230933-85.230934v0.034134h396.6976a85.333333 85.333333 0 0 1 85.265067 85.230933V693.248z"/>
+                    <path fill="currentColor" d="M562.926933 514.116267c0.682667-1.058133 1.604267-1.911467 2.048-3.072a20.718933 20.718933 0 0 0 1.604267-7.9872c0-0.3072-0.170667-0.546133-0.170667-0.853334 0-0.2048 0.136533-0.4096 0.1024-0.6144-0.034133-0.580267-0.443733-0.989867-0.546133-1.570133a19.899733 19.899733 0 0 0-10.103467-14.6432l-0.136533-0.1024-0.2048-0.1024c-0.7168-0.375467-1.3312-0.8192-2.082133-1.092267l-126.3616-66.935466a20.48 20.48 0 1 0-19.1488 36.215466l55.227733 29.252267h-5.700267a342.869333 342.869333 0 0 0-295.048533 169.506133 20.48 20.48 0 1 0 35.396267 20.650667 301.806933 301.806933 0 0 1 259.6864-149.230933h29.320533l-68.061867 52.872533a20.445867 20.445867 0 1 0 25.156267 32.324267l114.858667-89.224534c0.512-0.375467 0.682667-1.024 1.160533-1.467733 1.160533-1.1264 2.082133-2.525867 3.003733-3.925333z"/>
+                </svg>
+                DCS Converter
             </div>
 
             <div class="upload-section">
@@ -861,7 +935,7 @@
 
             <div class="action-section">
                 <button class="btn btn-primary" id="convertBtn" disabled>转换</button>
-                <button class="btn btn-secondary" id="downloadBtn" disabled>导出</button>
+                <button class="btn btn-secondary" id="downloadBtn" disabled>导出 Markdown</button>
             </div>
         </div>
 
@@ -1205,9 +1279,9 @@
                 type: results.hasSpecial ? 'warning' : 'success',
                 title: results.hasSpecial ? '检测到特殊分隔符' : '转换完成',
                 message: results.hasSpecial 
-                    ? `发现 ${results.specialCount} 处特殊分隔符，已跳过自动处理，建议手动检查`
+                    ? `发现 ${results.specialCount} 处特殊分隔符，已自动转换处理`
                     : `成功处理 ${results.sheetCount} 个 Sheet，共 ${results.totalRows} 行数据`,
-                tags: results.specialLocations
+                locations: results.hasSpecial ? results.specialLocations : []
             });
 
             if (results.sheetCount > 1) {
@@ -1215,13 +1289,21 @@
                     type: 'success',
                     title: '批量处理',
                     message: `已完成全部 ${results.sheetCount} 个 Sheet 的转换`,
-                    tags: results.sheetNames
+                    locations: []
                 });
             }
 
             statusCards.innerHTML = cards.map(c => {
-                const tagsHtml = c.tags && c.tags.length > 0 
-                    ? `<div class="status-card-tags">${c.tags.slice(0, 4).map(t => `<span class="status-tag">${t}</span>`).join('')}${c.tags.length > 4 ? `<span class="status-tag">+${c.tags.length - 4}</span>` : ''}</div>` 
+                const locationsHtml = c.locations && c.locations.length > 0
+                    ? `<div class="status-card-locations">
+                         <div class="status-locations-label">涉及位置：</div>
+                         <div class="status-location-tags">
+                           ${c.locations.slice(0, 5).map(loc => 
+                             `<span class="status-location-tag" title="文件: ${loc.file}">${loc.display}</span>`
+                           ).join('')}
+                           ${c.locations.length > 5 ? `<span class="status-location-tag">+${c.locations.length - 5}</span>` : ''}
+                         </div>
+                       </div>`
                     : '';
 
                 return `
@@ -1231,7 +1313,7 @@
                             <div class="status-card-title">${c.title}</div>
                         </div>
                         <div class="status-card-body">${c.message}</div>
-                        ${tagsHtml}
+                        ${locationsHtml}
                     </div>
                 `;
             }).join('');
@@ -1253,9 +1335,10 @@
 
             const converters = [];
             const allOutput = [];
-            const allSpecialLocations = new Set();
+            const allSpecialLocations = [];
             let totalRows = 0;
 
+            const fileName = originalFileName || '未知文件';
             const sheetNames = exportRange === 'single' 
                 ? [workbook.SheetNames[currentSheetIndex]]
                 : workbook.SheetNames;
@@ -1271,8 +1354,19 @@
                 converters.push(converter);
 
                 converter.special_separator_positions.forEach(([row, col]) => {
-                    const colName = ['A', 'B', 'C', 'D', 'E'][col] || `Col${col}`;
-                    allSpecialLocations.add(`R${row + 1}${colName}`);
+                    // 确保 row 和 col 是有效整数
+                    const rowNum = parseInt(row);
+                    const colNum = parseInt(col);
+                    if (isNaN(rowNum) || isNaN(colNum)) return;
+                    
+                    const colName = ['A', 'B', 'C', 'D', 'E'][colNum] || `Col${colNum}`;
+                    allSpecialLocations.push({
+                        file: fileName,
+                        sheet: name,
+                        row: rowNum + 1,
+                        col: colName,
+                        display: `${name} 行${rowNum + 1} ${colName}列`
+                    });
                 });
 
                 if (result.trim()) {
@@ -1292,9 +1386,9 @@
             renderOutline(outline);
 
             displayStatus({
-                hasSpecial: allSpecialLocations.size > 0,
-                specialCount: allSpecialLocations.size,
-                specialLocations: Array.from(allSpecialLocations),
+                hasSpecial: allSpecialLocations.length > 0,
+                specialCount: allSpecialLocations.length,
+                specialLocations: allSpecialLocations,
                 sheetCount: sheetNames.length,
                 sheetNames: sheetNames,
                 totalRows: totalRows
