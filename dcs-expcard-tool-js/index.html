@@ -360,29 +360,7 @@
             color: var(--text-muted);
         }
 
-        /* 输出面板 */
-        .output-panel {
-            flex: 1;
-            display: flex;
-            background: var(--surface);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            overflow: hidden;
-            min-height: 0;
-        }
-
-        /* Markdown 渲染区 - Lapis 风格 */
-        .md-render {
-            flex: 1;
-            overflow-y: auto;
-            padding: 28px 32px;
-            font-size: 15px;
-            line-height: 1.7;
-            color: var(--md-text, #40464f);
-            word-break: break-word;
-        }
-
+        /* Markdown 渲染区样式 */
         .md-render h1,
         .md-render h2,
         .md-render h3 {
@@ -500,27 +478,110 @@
             font-size: 13px;
         }
 
-        /* 大纲 - 树形结构 */
-        .md-outline {
-            width: 220px;
-            flex-shrink: 0;
-            padding: 16px;
-            overflow-y: auto;
+        /* 大纲面板 */
+        .output-panel {
+            flex: 1;
+            display: flex;
             background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            min-height: 0;
+            position: relative;
+        }
+
+        .md-render {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 28px;
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--md-text);
+            word-break: break-word;
+            transition: margin-right 0.25s ease;
+        }
+
+        .md-render.outline-pinned {
+            margin-right: 0;
+        }
+
+        /* 大纲浮窗（悬停弹出） */
+        .outline-float {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--md-block-bg);
             border-left: 1px solid var(--border);
+            box-shadow: -4px 0 16px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            z-index: 50;
+            transform: translateX(100%);
+            transition: transform 0.2s ease;
+            pointer-events: none;
+        }
+
+        .outline-wrapper:hover .outline-float:not(.disabled) {
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        /* 大纲固定（内嵌） */
+        .outline-inline {
+            width: 0;
+            flex-shrink: 0;
+            background: var(--md-block-bg);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: width 0.25s ease;
+        }
+
+        .outline-inline.pinned {
+            width: 240px;
+        }
+
+        .outline-hover-trigger {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 16px;
+            z-index: 5;
+        }
+
+        .outline-resize-handle {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: transparent;
+            cursor: col-resize;
+            z-index: 10;
+            transition: background 0.15s ease;
+        }
+
+        .outline-resize-handle:hover,
+        .outline-resize-handle.active {
+            background: var(--primary);
         }
 
         .outline-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
+            padding: 10px 12px;
             border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
         }
 
         .outline-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--text-primary);
             display: flex;
@@ -531,27 +592,42 @@
         .outline-title::before {
             content: '';
             width: 3px;
-            height: 14px;
+            height: 12px;
             background: var(--primary);
             border-radius: 2px;
         }
 
-        .outline-toggle-all {
-            padding: 4px 10px;
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-muted);
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.15s ease;
+        .outline-actions {
+            display: flex;
+            gap: 4px;
         }
 
-        .outline-toggle-all:hover {
+        .outline-action-btn {
+            padding: 4px 8px;
+            font-size: 11px;
+            color: var(--text-muted);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.12s ease;
+        }
+
+        .outline-action-btn:hover {
             color: var(--primary);
             border-color: var(--primary);
+        }
+
+        .outline-action-btn.active {
+            color: var(--primary);
             background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        .outline-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
         }
 
         .outline-tree {
@@ -560,87 +636,87 @@
             margin: 0;
         }
 
-        .outline-tree-item {
-            margin-bottom: 4px;
+        .outline-item {
+            margin-bottom: 2px;
         }
 
-        .outline-tree-node {
+        .outline-node {
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 8px 10px;
-            border-radius: 8px;
+            padding: 6px 8px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.15s ease;
-            font-size: 13px;
+            transition: all 0.1s ease;
+            font-size: 12px;
             color: var(--text-secondary);
         }
 
-        .outline-tree-node:hover {
-            background: var(--bg);
+        .outline-node:hover {
+            background: var(--surface);
             color: var(--text-primary);
         }
 
-        .outline-tree-node.active {
+        .outline-node.active {
             background: var(--primary-light);
             color: var(--primary);
             font-weight: 500;
         }
 
-        .outline-tree-toggle {
-            width: 16px;
-            height: 16px;
+        .outline-toggle {
+            width: 14px;
+            height: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 9px;
             color: var(--text-muted);
-            background: var(--bg);
-            border-radius: 4px;
-            transition: all 0.15s ease;
+            background: var(--surface);
+            border-radius: 3px;
+            transition: all 0.1s ease;
             flex-shrink: 0;
         }
 
-        .outline-tree-toggle:hover {
+        .outline-toggle:hover {
             background: var(--border);
         }
 
-        .outline-tree-toggle.expanded {
+        .outline-toggle.expanded {
             transform: rotate(90deg);
             color: var(--primary);
         }
 
-        .outline-tree-toggle.hidden {
+        .outline-toggle.hidden {
             visibility: hidden;
         }
 
-        .outline-tree-label {
+        .outline-label {
             flex: 1;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
-        .outline-tree-children {
+        .outline-children {
             list-style: none;
-            padding-left: 12px;
+            padding-left: 10px;
             margin: 0;
             overflow: hidden;
             transition: max-height 0.2s ease;
             border-left: 1px solid var(--border);
-            margin-left: 8px;
-            margin-top: 2px;
+            margin-left: 6px;
+            margin-top: 1px;
         }
 
-        .outline-tree-children.collapsed {
+        .outline-children.collapsed {
             max-height: 0 !important;
         }
 
         .outline-empty {
             color: var(--text-muted);
-            font-size: 12px;
+            font-size: 11px;
             text-align: center;
-            padding: 24px 0;
+            padding: 20px 0;
         }
 
         /* 底部状态栏 */
@@ -888,11 +964,19 @@
                 flex-direction: column;
             }
 
-            .md-outline {
-                width: 100%;
-                max-height: 150px;
+            .outline-wrapper {
+                display: none;
+            }
+
+            .outline-inline {
+                width: 100% !important;
+                max-height: 200px;
                 border-left: none;
                 border-top: 1px solid var(--border);
+            }
+
+            .outline-resize-handle {
+                display: none;
             }
         }
     </style>
@@ -963,14 +1047,39 @@
                         <div class="md-render-empty-text">转换后在此预览</div>
                     </div>
                 </div>
-                <div class="md-outline">
+                <div class="outline-wrapper">
+                    <div class="outline-hover-trigger"></div>
+                    <!-- 浮窗版本（悬停显示） -->
+                    <div class="outline-float" id="outlineFloat">
+                        <div class="outline-header">
+                            <div class="outline-title">大纲</div>
+                            <div class="outline-actions">
+                                <button class="outline-action-btn" id="outlineToggleAllFloat">展开</button>
+                                <button class="outline-action-btn" id="outlinePinBtnFloat" title="固定大纲">📌</button>
+                            </div>
+                        </div>
+                        <div class="outline-body">
+                            <ul class="outline-tree" id="outlineTreeFloat">
+                                <li class="outline-empty">暂无内容</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- 固定版本（内嵌显示） -->
+                <div class="outline-inline" id="outlineInline">
+                    <div class="outline-resize-handle" id="outlineResizeHandle"></div>
                     <div class="outline-header">
                         <div class="outline-title">大纲</div>
-                        <button class="outline-toggle-all" id="outlineToggleAll">展开</button>
+                        <div class="outline-actions">
+                            <button class="outline-action-btn" id="outlineToggleAllInline">展开</button>
+                            <button class="outline-action-btn active" id="outlinePinBtnInline" title="取消固定">📌</button>
+                        </div>
                     </div>
-                    <ul class="outline-tree" id="outlineTree">
-                        <li class="outline-empty">暂无内容</li>
-                    </ul>
+                    <div class="outline-body">
+                        <ul class="outline-tree" id="outlineTreeInline">
+                            <li class="outline-empty">暂无内容</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
@@ -996,8 +1105,13 @@
         const convertBtn = document.getElementById('convertBtn');
         const downloadBtn = document.getElementById('downloadBtn');
         const mdRender = document.getElementById('mdRender');
-        const outlineTree = document.getElementById('outlineTree');
-        const outlineToggleAll = document.getElementById('outlineToggleAll');
+        const outlineTreeFloat = document.getElementById('outlineTreeFloat');
+        const outlineTreeInline = document.getElementById('outlineTreeInline');
+        const outlineToggleAllFloat = document.getElementById('outlineToggleAllFloat');
+        const outlineToggleAllInline = document.getElementById('outlineToggleAllInline');
+        const outlinePinBtnFloat = document.getElementById('outlinePinBtnFloat');
+        const outlinePinBtnInline = document.getElementById('outlinePinBtnInline');
+        const outlineInline = document.getElementById('outlineInline');
         const statusCards = document.getElementById('statusCards');
         const fileNameDisplay = document.getElementById('fileNameDisplay');
         const filenameInput = document.getElementById('filenameInput');
@@ -1188,32 +1302,37 @@
         let allExpanded = true;
 
         function renderOutline(headings) {
+            const emptyHtml = '<li class="outline-empty">暂无内容</li>';
+            
             if (headings.length === 0) {
-                outlineTree.innerHTML = '<li class="outline-empty">暂无内容</li>';
+                outlineTreeFloat.innerHTML = emptyHtml;
+                outlineTreeInline.innerHTML = emptyHtml;
                 return;
             }
 
             const tree = buildTree(headings);
             allExpanded = true;
-            outlineToggleAll.textContent = '折叠';
-            outlineTree.innerHTML = renderTreeNodes(tree);
+            outlineToggleAllFloat.textContent = '折叠';
+            outlineToggleAllInline.textContent = '折叠';
+            outlineTreeFloat.innerHTML = renderTreeNodes(tree);
+            outlineTreeInline.innerHTML = renderTreeNodes(tree);
             bindOutlineEvents();
         }
 
         function renderTreeNodes(nodes, depth = 0) {
             return nodes.map(node => {
                 const hasChildren = node.children.length > 0;
-                const toggleClass = hasChildren ? 'outline-tree-toggle expanded' : 'outline-tree-toggle hidden';
+                const toggleClass = hasChildren ? 'outline-toggle expanded' : 'outline-toggle hidden';
 
                 const childrenHtml = hasChildren 
-                    ? `<ul class="outline-tree-children">${renderTreeNodes(node.children, depth + 1)}</ul>`
+                    ? `<ul class="outline-children">${renderTreeNodes(node.children, depth + 1)}</ul>`
                     : '';
 
                 return `
-                    <li class="outline-tree-item" data-id="${node.id}">
-                        <div class="outline-tree-node" data-level="${node.level}" data-index="${node.domIndex}">
+                    <li class="outline-item" data-id="${node.id}">
+                        <div class="outline-node" data-level="${node.level}" data-index="${node.domIndex}">
                             <span class="${toggleClass}">▶</span>
-                            <span class="outline-tree-label">${node.text}</span>
+                            <span class="outline-label">${node.text}</span>
                         </div>
                         ${childrenHtml}
                     </li>
@@ -1222,27 +1341,30 @@
         }
 
         function bindOutlineEvents() {
-            document.querySelectorAll('.outline-tree-node').forEach(node => {
+            // 绑定浮窗事件
+            document.querySelectorAll('#outlineFloat .outline-node').forEach(node => {
                 node.addEventListener('click', (e) => {
-                    const level = parseInt(node.dataset.level);
-                    const index = parseInt(node.dataset.index);
-                    
-                    const selector = level === 1 ? 'h1' : level === 2 ? 'h2' : 'h3';
-                    const headings = mdRender.querySelectorAll(selector);
-                    
-                    if (headings[index]) {
-                        headings[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        document.querySelectorAll('.outline-tree-node').forEach(n => n.classList.remove('active'));
-                        node.classList.add('active');
-                    }
+                    scrollToHeading(node);
+                    document.querySelectorAll('.outline-node').forEach(n => n.classList.remove('active'));
+                    node.classList.add('active');
                 });
             });
 
-            document.querySelectorAll('.outline-tree-toggle:not(.hidden)').forEach(toggle => {
+            // 绑定固定版事件
+            document.querySelectorAll('#outlineInline .outline-node').forEach(node => {
+                node.addEventListener('click', (e) => {
+                    scrollToHeading(node);
+                    document.querySelectorAll('.outline-node').forEach(n => n.classList.remove('active'));
+                    node.classList.add('active');
+                });
+            });
+
+            // 绑定折叠按钮
+            document.querySelectorAll('.outline-toggle:not(.hidden)').forEach(toggle => {
                 toggle.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const item = toggle.closest('.outline-tree-item');
-                    const children = item.querySelector('.outline-tree-children');
+                    const item = toggle.closest('.outline-item');
+                    const children = item.querySelector('.outline-children');
                     if (children) {
                         toggle.classList.toggle('expanded');
                         children.classList.toggle('collapsed');
@@ -1251,11 +1373,24 @@
             });
         }
 
-        outlineToggleAll.addEventListener('click', () => {
-            allExpanded = !allExpanded;
-            outlineToggleAll.textContent = allExpanded ? '折叠' : '展开';
+        function scrollToHeading(node) {
+            const level = parseInt(node.dataset.level);
+            const index = parseInt(node.dataset.index);
+            
+            const selector = level === 1 ? 'h1' : level === 2 ? 'h2' : 'h3';
+            const headings = mdRender.querySelectorAll(selector);
+            
+            if (headings[index]) {
+                headings[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
 
-            document.querySelectorAll('.outline-tree-children').forEach(children => {
+        function toggleAllOutlines() {
+            allExpanded = !allExpanded;
+            outlineToggleAllFloat.textContent = allExpanded ? '折叠' : '展开';
+            outlineToggleAllInline.textContent = allExpanded ? '折叠' : '展开';
+
+            document.querySelectorAll('.outline-children').forEach(children => {
                 if (allExpanded) {
                     children.classList.remove('collapsed');
                 } else {
@@ -1263,13 +1398,63 @@
                 }
             });
 
-            document.querySelectorAll('.outline-tree-toggle:not(.hidden)').forEach(toggle => {
+            document.querySelectorAll('.outline-toggle:not(.hidden)').forEach(toggle => {
                 if (allExpanded) {
                     toggle.classList.add('expanded');
                 } else {
                     toggle.classList.remove('expanded');
                 }
             });
+        }
+
+        outlineToggleAllFloat.addEventListener('click', toggleAllOutlines);
+        outlineToggleAllInline.addEventListener('click', toggleAllOutlines);
+
+        // 大纲固定/取消固定
+        const outlineFloat = document.getElementById('outlineFloat');
+
+        function togglePin() {
+            const isPinned = outlineInline.classList.toggle('pinned');
+            outlineFloat.classList.toggle('disabled', isPinned);
+            outlinePinBtnFloat.classList.toggle('active', isPinned);
+            outlinePinBtnInline.classList.toggle('active', isPinned);
+            outlinePinBtnFloat.title = isPinned ? '取消固定' : '固定大纲';
+            outlinePinBtnInline.title = isPinned ? '取消固定' : '固定大纲';
+        }
+
+        outlinePinBtnFloat.addEventListener('click', togglePin);
+        outlinePinBtnInline.addEventListener('click', togglePin);
+
+        // 大纲拖拽调整宽度
+        const outlineResizeHandle = document.getElementById('outlineResizeHandle');
+        let isResizing = false;
+
+        outlineResizeHandle.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            outlineResizeHandle.classList.add('active');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+
+            const panelRect = outlineInline.getBoundingClientRect();
+            const newWidth = panelRect.right - e.clientX;
+
+            if (newWidth >= 180 && newWidth <= 350) {
+                outlineInline.style.width = newWidth + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isResizing) {
+                isResizing = false;
+                outlineResizeHandle.classList.remove('active');
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            }
         });
 
         function displayStatus(results) {
