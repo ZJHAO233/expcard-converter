@@ -20,6 +20,12 @@ class DCSConverter:
         '或取反': '或取反',
     }
 
+    # 特殊分隔符字典: 键为特殊分隔符的值, 值为处理方式描述
+    # 用于模糊检测特殊分隔符, 在默认逻辑分隔符判断之前进行检测
+    SPECIAL_SEPARATORS = {
+        # 示例: '特殊值': '处理方式说明',
+    }
+
     # 所有可能的逻辑分隔符（用于识别）
     LOGIC_SEPARATORS = list(LOGIC_OPERATORS.keys())
 
@@ -29,6 +35,7 @@ class DCSConverter:
         self.skip_section = False
         self.current_sub_title_logic = None
         self.processed_rows = set()
+        self.special_separator_positions = set()  # 记录特殊分隔符匹配的行列号
 
     def convert(self, file_path, sheet_index=0):
         wb = openpyxl.load_workbook(file_path)
@@ -47,6 +54,7 @@ class DCSConverter:
         self.skip_section = False
         self.current_sub_title_logic = None
         self.processed_rows = set()
+        self.special_separator_positions = set()
 
         for i, row in enumerate(rows):
             if i in self.processed_rows:
@@ -54,6 +62,14 @@ class DCSConverter:
             self._process_row(row, rows, i)
 
         return '\n'.join(self.output)
+
+    def _is_special_separator(self, text, row_index=None, col_index=None):
+        """检测是否为特殊分隔符, 如果匹配则记录行列号并返回True"""
+        if text in self.SPECIAL_SEPARATORS:
+            if row_index is not None and col_index is not None:
+                self.special_separator_positions.add((row_index, col_index))
+            return True
+        return False
 
     def _process_row(self, row, all_rows, index):
         a = row[0] if len(row) > 0 else ''
@@ -145,6 +161,10 @@ class DCSConverter:
         return None
 
     def _process_level1(self, a, b, c, row, all_rows, index, use_seq_num=False):
+        # 先检测特殊分隔符（在默认逻辑分隔符判断之前）
+        if b:
+            self._is_special_separator(b, row_index=index, col_index=1)
+
         # 判断是否有子项
         has_children = False
         child_logic = None
@@ -195,6 +215,16 @@ class DCSConverter:
         c_val = c
         d_val = row[3] if len(row) > 3 else ''
         e_val = row[4] if len(row) > 4 else ''
+
+        # 先检测特殊分隔符（在默认逻辑分隔符判断之前）
+        if b_val:
+            self._is_special_separator(b_val, row_index=index, col_index=1)
+        if c_val:
+            self._is_special_separator(c_val, row_index=index, col_index=2)
+        if d_val:
+            self._is_special_separator(d_val, row_index=index, col_index=3)
+        if e_val:
+            self._is_special_separator(e_val, row_index=index, col_index=4)
 
         b_is_logic = self._is_logic_separator(b_val)
         c_is_logic = self._is_logic_separator(c_val)
@@ -432,6 +462,7 @@ class DCSConverter:
         self.skip_section = False
         self.current_sub_title_logic = None
         self.processed_rows = set()
+        self.special_separator_positions = set()
         self.current_sheet_name = ws.title
         self.item_counter = 0  # 顺序编号计数器
 
@@ -494,6 +525,12 @@ class DCSConverter:
         b = row[1] if len(row) > 1 else ''
         c = row[2] if len(row) > 2 else ''
 
+        # 先检测特殊分隔符（在默认逻辑分隔符判断之前）
+        if b:
+            self._is_special_separator(b, row_index=index, col_index=1)
+        if c:
+            self._is_special_separator(c, row_index=index, col_index=2)
+
         # 检测下一行A列是否是x.y格式
         if index + 1 < len(all_rows):
             next_a = all_rows[index + 1][0]
@@ -536,6 +573,10 @@ class DCSConverter:
     def _process_new_level2(self, item_num, b_logic, row, all_rows, index):
         c = row[2] if len(row) > 2 else ''
 
+        # 先检测特殊分隔符（在默认逻辑分隔符判断之前）
+        if c:
+            self._is_special_separator(c, row_index=index, col_index=2)
+
         c_is_logic = self._is_logic_separator(c)
 
         # 确定二级遍历范围：从当前行开始，向下数B列空行直到下一个B列逻辑
@@ -548,6 +589,10 @@ class DCSConverter:
                 break
             next_row = all_rows[j]
             next_c = next_row[2] if len(next_row) > 2 else ''
+
+            # 先检测特殊分隔符
+            if next_c:
+                self._is_special_separator(next_c, row_index=j, col_index=2)
 
             if j == index:
                 # 当前行：C列是逻辑 → 三级处理
@@ -578,6 +623,10 @@ class DCSConverter:
     def _process_new_level3(self, item_num, c_logic, row, all_rows, index):
         d = row[3] if len(row) > 3 else ''
 
+        # 先检测特殊分隔符（在默认逻辑分隔符判断之前）
+        if d:
+            self._is_special_separator(d, row_index=index, col_index=3)
+
         d_is_logic = self._is_logic_separator(d)
 
         # 确定三级遍历范围：从当前行开始，向下数C列空行直到下一个C列逻辑
@@ -590,6 +639,10 @@ class DCSConverter:
                 break
             next_row = all_rows[j]
             next_d = next_row[3] if len(next_row) > 3 else ''
+
+            # 先检测特殊分隔符
+            if next_d:
+                self._is_special_separator(next_d, row_index=j, col_index=3)
 
             if j == index:
                 # 当前行：D列是逻辑 → 四级处理
@@ -623,6 +676,10 @@ class DCSConverter:
     def _process_new_level4(self, item_num, d_logic, row, all_rows, index):
         e = row[4] if len(row) > 4 else ''
 
+        # 先检测特殊分隔符（在默认逻辑分隔符判断之前）
+        if e:
+            self._is_special_separator(e, row_index=index, col_index=4)
+
         # 确定四级遍历范围：从当前行开始，向下数D列空行直到下一个D列逻辑
         end_index = self._find_end_index(all_rows, index, col=3)
 
@@ -633,6 +690,10 @@ class DCSConverter:
                 break
             next_row = all_rows[j]
             next_e = next_row[4] if len(next_row) > 4 else ''
+
+            # 先检测特殊分隔符
+            if next_e:
+                self._is_special_separator(next_e, row_index=j, col_index=4)
 
             if j == index:
                 # 当前行：E列内容

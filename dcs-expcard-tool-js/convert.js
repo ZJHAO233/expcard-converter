@@ -9,14 +9,19 @@ class DCSConverter {
     this.skip_section = false;
     this.current_sub_title_logic = null;
     this.processed_rows = new Set();
+    this.special_separator_positions = new Set();
+    this.item_counter = 0;
 
     // 逻辑运算符字典
     this.LOGIC_OPERATORS = {
       与: "且",
       且: "且",
       或: "或",
-      或取反: "异或",
+      或取反: "或取反",
     };
+
+    // 特殊分隔符字典: 键为特殊分隔符的值, 值为处理方式描述
+    this.SPECIAL_SEPARATORS = {};
 
     // 所有可能的逻辑分隔符
     this.LOGIC_SEPARATORS = Object.keys(this.LOGIC_OPERATORS);
@@ -34,6 +39,8 @@ class DCSConverter {
     this.skip_section = false;
     this.current_sub_title_logic = null;
     this.processed_rows = new Set();
+    this.special_separator_positions = new Set();
+    this.item_counter = 0;
 
     for (let i = 0; i < rows.length; i++) {
       if (this.processed_rows.has(i)) continue;
@@ -41,6 +48,16 @@ class DCSConverter {
     }
 
     return this.output.join("\n");
+  }
+
+  _is_special_separator(text, rowIndex = null, colIndex = null) {
+    if (text in this.SPECIAL_SEPARATORS) {
+      if (rowIndex !== null && colIndex !== null) {
+        this.special_separator_positions.add([rowIndex, colIndex]);
+      }
+      return true;
+    }
+    return false;
   }
 
   _process_row(row, all_rows, index) {
@@ -144,7 +161,12 @@ class DCSConverter {
     return null;
   }
 
-  _process_level1(a, b, c, row, all_rows, index) {
+  _process_level1(a, b, c, row, all_rows, index, useSeqNum = false) {
+    // 先检测特殊分隔符
+    if (b) {
+      this._is_special_separator(b, index, 1);
+    }
+
     let has_children = false;
     let child_logic = null;
 
@@ -177,7 +199,11 @@ class DCSConverter {
       logic_str = "（或取反）";
     }
 
-    this.output.push(a + ". " + content + logic_str);
+    if (useSeqNum) {
+      this.output.push(this.item_counter + ". " + content + logic_str);
+    } else {
+      this.output.push(a + ". " + content + logic_str);
+    }
   }
 
   _process_level2(a, b, c, row, all_rows, index) {
@@ -185,6 +211,12 @@ class DCSConverter {
     const c_val = c || "";
     const d_val = row[3] || "";
     const e_val = row[4] || "";
+
+    // 先检测特殊分隔符
+    if (b_val) this._is_special_separator(b_val, index, 1);
+    if (c_val) this._is_special_separator(c_val, index, 2);
+    if (d_val) this._is_special_separator(d_val, index, 3);
+    if (e_val) this._is_special_separator(e_val, index, 4);
 
     const b_is_logic = this._is_logic_separator(b_val);
     const c_is_logic = this._is_logic_separator(c_val);
@@ -226,15 +258,7 @@ class DCSConverter {
     }
   }
 
-  _process_level3_group(
-    a,
-    c_logic,
-    d_logic,
-    first_content,
-    row,
-    all_rows,
-    index,
-  ) {
+  _process_level3_group(a, c_logic, d_logic, first_content, row, all_rows, index) {
     const level3_groups = [];
     let current_group_items = first_content ? [first_content] : [];
     let current_d_logic = d_logic;
@@ -405,6 +429,303 @@ class DCSConverter {
     } else if (group_items.length > 0) {
       this.output.push("   - " + group_items[0]);
     }
+  }
+
+  // ==================== New Mode Methods ====================
+
+  convertNew(rows) {
+    this.output = [];
+    this.in_content_area = false;
+    this.skip_section = false;
+    this.current_sub_title_logic = null;
+    this.processed_rows = new Set();
+    this.special_separator_positions = new Set();
+    this.item_counter = 0;
+
+    for (let i = 0; i < rows.length; i++) {
+      if (this.processed_rows.has(i)) continue;
+      this._processNewRow(rows[i], rows, i);
+    }
+
+    return this.output.join("\n");
+  }
+
+  _processNewRow(row, all_rows, index) {
+    const a = row[0] || "";
+    const b = row[1] || "";
+
+    if (!a && !b) return;
+    if (this._is_header_row(row)) return;
+
+    // 二级标题
+    if (this._is_chinese_number_title(a)) {
+      this.output.push("");
+      this.output.push("## " + a);
+      this.in_content_area = false;
+      this.skip_section = false;
+      return;
+    }
+
+    // 段落标题
+    if (this.SECTION_HEADERS.includes(a)) {
+      if (a === "试验条件") {
+        this.skip_section = true;
+      }
+      this.in_content_area = false;
+      return;
+    }
+
+    // 进入内容区域
+    if (a === "试验内容") {
+      this.in_content_area = true;
+      this.skip_section = false;
+      return;
+    }
+
+    if (this.skip_section) return;
+
+    // 三级标题
+    if (this._is_sub_title(a)) {
+      const normalized = a.replace(/\(/g, "（").replace(/\)/g, "）");
+      this.output.push("");
+      this.output.push("### " + normalized);
+      this.output.push("");
+      this.current_sub_title_logic = this._extract_title_logic(normalized);
+      this.item_counter = 0;
+      return;
+    }
+
+    // 纯数字序号 → 新模式处理
+    if (/^\d+$/.test(a)) {
+      this._processNewItem(a, row, all_rows, index);
+      return;
+    }
+  }
+
+  _processNewItem(a, row, all_rows, index) {
+    const b = row[1] || "";
+    const c = row[2] || "";
+
+    // 先检测特殊分隔符
+    if (b) this._is_special_separator(b, index, 1);
+    if (c) this._is_special_separator(c, index, 2);
+
+    // 检测下一行A列是否是x.y格式
+    if (index + 1 < all_rows.length) {
+      const next_a = all_rows[index + 1][0] || "";
+      if (this._is_sub_item(next_a)) {
+        // 下一行是x.y格式 → old模式处理
+        this.item_counter += 1;
+        this._process_level1(a, b, c, row, all_rows, index, true);
+        // 处理所有x.y子项
+        let j = index + 1;
+        while (j < all_rows.length) {
+          if (this.processed_rows.has(j)) {
+            j++;
+            continue;
+          }
+          const next_row = all_rows[j];
+          const next_a_val = next_row[0] || "";
+          if (this._is_sub_item(next_a_val) && next_a_val.startsWith(a + ".")) {
+            this._process_level2(
+              next_a_val,
+              next_row[1] || "",
+              next_row[2] || "",
+              next_row,
+              all_rows,
+              j
+            );
+            this.processed_rows.add(j);
+            j++;
+          } else {
+            break;
+          }
+        }
+        return;
+      }
+    }
+
+    // 下一行不是x.y格式 → new模式执行检测
+    const b_is_logic = this._is_logic_separator(b);
+
+    // B列不是逻辑 → 一级（直接输出）
+    if (!b_is_logic) {
+      const content = b || "";
+      this.item_counter += 1;
+      this.output.push(this.item_counter + ". " + content);
+      return;
+    }
+
+    // B列是逻辑 → 进入二级处理
+    this.item_counter += 1;
+    const result = this._processNewLevel2(this.item_counter, b, row, all_rows, index);
+    this.output.push(this.item_counter + ". " + result);
+  }
+
+  _processNewLevel2(itemNum, b_logic, row, all_rows, index) {
+    const c = row[2] || "";
+
+    // 先检测特殊分隔符
+    if (c) this._is_special_separator(c, index, 2);
+
+    const c_is_logic = this._is_logic_separator(c);
+
+    // 确定二级遍历范围
+    const endIndex = this._findEndIndex(all_rows, index, 1);
+
+    const items = [];
+    let j = index;
+    while (j <= endIndex) {
+      if (j >= all_rows.length) break;
+      const next_row = all_rows[j];
+      const next_c = next_row[2] || "";
+
+      // 先检测特殊分隔符
+      if (next_c) this._is_special_separator(next_c, j, 2);
+
+      if (j === index) {
+        // 当前行：C列是逻辑 → 三级处理
+        if (c_is_logic) {
+          const level3Result = this._processNewLevel3(itemNum, c, next_row, all_rows, j);
+          items.push(level3Result);
+        } else if (c) {
+          items.push(c);
+        }
+      } else {
+        // 后续行：C列是逻辑 → 三级处理
+        if (this._is_logic_separator(next_c)) {
+          const level3Result = this._processNewLevel3(itemNum, next_c, next_row, all_rows, j);
+          items.push(level3Result);
+          this.processed_rows.add(j);
+        } else if (next_c) {
+          items.push(next_c);
+          this.processed_rows.add(j);
+        }
+      }
+
+      j++;
+    }
+
+    // 用B列逻辑连接所有项目
+    const output_logic = this._get_logic_output(b_logic);
+    const separator = " " + output_logic + " ";
+    return items.join(separator);
+  }
+
+  _processNewLevel3(itemNum, c_logic, row, all_rows, index) {
+    const d = row[3] || "";
+
+    // 先检测特殊分隔符
+    if (d) this._is_special_separator(d, index, 3);
+
+    const d_is_logic = this._is_logic_separator(d);
+
+    // 确定三级遍历范围
+    const endIndex = this._findEndIndex(all_rows, index, 2);
+
+    const items = [];
+    let j = index;
+    while (j <= endIndex) {
+      if (j >= all_rows.length) break;
+      const next_row = all_rows[j];
+      const next_d = next_row[3] || "";
+
+      // 先检测特殊分隔符
+      if (next_d) this._is_special_separator(next_d, j, 3);
+
+      if (j === index) {
+        // 当前行：D列是逻辑 → 四级处理
+        if (d_is_logic) {
+          const level4Result = this._processNewLevel4(itemNum, d, next_row, all_rows, j);
+          items.push(level4Result);
+        } else if (d) {
+          items.push(d);
+        }
+      } else {
+        // 后续行：D列是逻辑 → 四级处理
+        if (this._is_logic_separator(next_d)) {
+          const level4Result = this._processNewLevel4(itemNum, next_d, next_row, all_rows, j);
+          items.push(level4Result);
+          this.processed_rows.add(j);
+        } else if (next_d) {
+          items.push(next_d);
+          this.processed_rows.add(j);
+        }
+      }
+
+      j++;
+    }
+
+    // 用C列逻辑连接，三层输出用（）包裹
+    const output_logic = this._get_logic_output(c_logic);
+    const separator = " " + output_logic + " ";
+    const result = items.join(separator);
+    if (items.length > 1) {
+      return "（" + result + "）";
+    }
+    return result;
+  }
+
+  _processNewLevel4(itemNum, d_logic, row, all_rows, index) {
+    const e = row[4] || "";
+
+    // 先检测特殊分隔符
+    if (e) this._is_special_separator(e, index, 4);
+
+    // 确定四级遍历范围
+    const endIndex = this._findEndIndex(all_rows, index, 3);
+
+    const items = [];
+    let j = index;
+    while (j <= endIndex) {
+      if (j >= all_rows.length) break;
+      const next_row = all_rows[j];
+      const next_e = next_row[4] || "";
+
+      // 先检测特殊分隔符
+      if (next_e) this._is_special_separator(next_e, j, 4);
+
+      if (j === index) {
+        // 当前行：E列内容
+        if (e && !this._is_logic_separator(e)) {
+          items.push(e);
+        }
+      } else {
+        // 后续行：E列内容
+        if (next_e && !this._is_logic_separator(next_e)) {
+          items.push(next_e);
+          this.processed_rows.add(j);
+        }
+      }
+
+      j++;
+    }
+
+    // 用D列逻辑连接，四层输出用（）包裹
+    const output_logic = this._get_logic_output(d_logic);
+    const separator = " " + output_logic + " ";
+    const result = items.join(separator);
+    if (items.length > 1) {
+      return "（" + result + "）";
+    }
+    return result;
+  }
+
+  _findEndIndex(all_rows, startIndex, col) {
+    let j = startIndex + 1;
+    while (j < all_rows.length) {
+      const next_row = all_rows[j];
+      const val = next_row[col] || "";
+
+      // 遇到逻辑分隔符 → 结束
+      if (this._is_logic_separator(val)) {
+        return j - 1;
+      }
+
+      j++;
+    }
+
+    return all_rows.length - 1;
   }
 }
 
