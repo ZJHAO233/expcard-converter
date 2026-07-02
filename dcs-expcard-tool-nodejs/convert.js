@@ -40,13 +40,24 @@ class DCSConverter {
   }
 
   _isSpecialSeparator(text, rowIndex = null, colIndex = null) {
-    if (text in this.SPECIAL_SEPARATORS) {
-      if (rowIndex !== null && colIndex !== null) {
-        this.special_separator_positions.add([rowIndex, colIndex]);
+    for (const key of Object.keys(this.SPECIAL_SEPARATORS)) {
+      if (text.startsWith(key)) {
+        if (rowIndex !== null && colIndex !== null) {
+          this.special_separator_positions.add([rowIndex, colIndex]);
+        }
+        return true;
       }
-      return true;
     }
     return false;
+  }
+
+  _getSpecialSeparatorOutput(text) {
+    for (const [key, value] of Object.entries(this.SPECIAL_SEPARATORS)) {
+      if (text.startsWith(key)) {
+        return value;
+      }
+    }
+    return text;
   }
 
   _processRow(row, allRows, index) {
@@ -127,10 +138,15 @@ class DCSConverter {
   }
 
   _isLogicSeparator(text) {
-    return this.LOGIC_SEPARATORS.includes(text);
+    return this.LOGIC_SEPARATORS.includes(text) || this._isSpecialSeparator(text);
   }
 
   _getLogicOutput(logic) {
+    for (const [key, value] of Object.entries(this.SPECIAL_SEPARATORS)) {
+      if (logic.startsWith(key)) {
+        return value;
+      }
+    }
     return this.LOGIC_OPERATORS[logic] || logic;
   }
 
@@ -157,7 +173,7 @@ class DCSConverter {
       if (this._isSubItem(nextSeqNum) && nextSeqNum.startsWith(seqNum + ".")) {
         hasChildren = true;
         const nextLogicCol = allRows[index + 1][1] || "";
-        childLogic = this._isLogicSeparator(nextLogicCol) ? nextLogicCol : null;
+        childLogic = this._isLogicSeparator(nextLogicCol) ? this._getLogicOutput(nextLogicCol) : null;
       }
     }
 
@@ -169,15 +185,18 @@ class DCSConverter {
     let logicStr = "";
     if (hasChildren && childLogic) {
       if (this._isLogicSeparator(logicCol)) {
-        if (logicCol !== this.currentSubTitleLogic) {
-          logicStr = "（" + logicCol + "）";
+        const outputLogic = this._getLogicOutput(logicCol);
+        if (outputLogic !== this.currentSubTitleLogic) {
+          logicStr = "（" + outputLogic + "）";
         }
       } else {
         logicStr = "（" + childLogic + "）";
       }
     }
 
-    if (logicCol && logicCol.includes("或取反")) {
+    if (logicCol && this._isSpecialSeparator(logicCol)) {
+      logicStr = "（" + this._getLogicOutput(logicCol) + "）";
+    } else if (logicCol && logicCol.includes("或取反")) {
       logicStr = "（或取反）";
     }
 
