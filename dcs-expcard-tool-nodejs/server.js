@@ -5,6 +5,37 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
+// 加载外部配置文件（如果存在）
+let EXPCARD_CONFIG;
+const configPath = path.join(process.cwd(), 'config.js');
+if (fs.existsSync(configPath)) {
+  try {
+    const configContent = fs.readFileSync(configPath, 'utf-8');
+    // 移除 module.exports 行，使其成为全局变量
+    const cleaned = configContent
+      .replace(/if\s*\(typeof\s+module\s*!==\s*['"]undefined['"]\s*&&\s*module\.exports\)\s*\{[\s\S]*?\}/g, '')
+      .replace(/module\.exports\s*=\s*EXPCARD_CONFIG\s*;?/g, '');
+    eval(cleaned);
+    EXPCARD_CONFIG = typeof EXPCARD_CONFIG !== 'undefined' ? EXPCARD_CONFIG : getDefaultConfig();
+    console.log('✅ 已加载外部配置文件: config.js');
+  } catch (err) {
+    console.warn('⚠️  配置文件加载失败，使用默认配置:', err.message);
+    EXPCARD_CONFIG = getDefaultConfig();
+  }
+} else {
+  console.log('ℹ️  未找到外部配置文件，使用默认配置');
+  EXPCARD_CONFIG = getDefaultConfig();
+}
+
+function getDefaultConfig() {
+  return {
+    LOGIC_OPERATORS: { '与': '且', '且': '且', '或': '或', '或取反': '或取反' },
+    SPECIAL_SEPARATORS: { '或延时': '或', '与延时': '且' },
+    SKIP_HEADERS: ['序号', '条件确认'],
+    SECTION_HEADERS: ['试验条件', '试验恢复', '结论', '存在问题']
+  };
+}
+
 const app = express();
 const PORT = process.env.PORT || 3210;
 

@@ -2,7 +2,7 @@
  * ExpCard Converter - Excel试验条件表转Markdown工具 (JS版本)
  */
 
-class DCSConverter {
+class ExpCardConverter {
   constructor() {
     this.output = [];
     this.in_content_area = false;
@@ -772,5 +772,5 @@ class DCSConverter {
 
 // 导出
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = DCSConverter;
+  module.exports = ExpCardConverter;
 }

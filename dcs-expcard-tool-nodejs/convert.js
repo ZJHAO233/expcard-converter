@@ -2,8 +2,17 @@
  * ExpCard Converter - Excel试验条件表转Markdown工具
  */
 
-class DCSConverter {
-  constructor(config = DCS_CONFIG) {
+class ExpCardConverter {
+  constructor(config = null) {
+    // 如果没有传入配置，尝试从全局变量获取，否则使用默认配置
+    if (config === null) {
+      config = (typeof EXPCARD_CONFIG !== 'undefined') ? EXPCARD_CONFIG : {
+        LOGIC_OPERATORS: { '与': '且', '且': '且', '或': '或', '或取反': '或取反' },
+        SPECIAL_SEPARATORS: { '或延时': '或', '与延时': '且' },
+        SKIP_HEADERS: ['序号', '条件确认'],
+        SECTION_HEADERS: ['试验条件', '试验恢复', '结论', '存在问题']
+      };
+    }
     this.config = config;
 
     // 从配置中读取
@@ -760,5 +769,5 @@ class DCSConverter {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = DCSConverter;
+  module.exports = ExpCardConverter;
 }

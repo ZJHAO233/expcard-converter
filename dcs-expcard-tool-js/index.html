@@ -2631,7 +2631,7 @@
                 const rows = processRawData(rawData);
                 totalRows += rows.length;
 
-                const converter = new DCSConverter();
+                const converter = new ExpCardConverter();
                 const result = converter.convertNew(rows);
                 converters.push(converter);
 

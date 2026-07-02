@@ -1,30 +1,29 @@
 /**
  * ExpCard Converter - 配置文件
- * 逻辑分隔符与特殊分隔符字典（可外部修改）
+ * 修改此文件可自定义逻辑运算符和特殊分隔符
+ * 打包时此文件外置，用户可在启动前修改
  */
 
-const DCS_CONFIG = {
+const EXPCARD_CONFIG = {
   // 逻辑运算符字典
+  // 格式: "Excel中的值": "输出格式"
   LOGIC_OPERATORS: {
-    与: "且",
-    且: "且",
-    或: "或",
-    或取反: "或取反",
+    "与": "且",
+    "且": "且",
+    "或": "或",
+    "或取反": "或取反",
   },
 
   // 特殊分隔符字典
+  // 格式: "Excel中的特殊值": "转换后的输出"
   SPECIAL_SEPARATORS: {
-    或延时: "或",
-    与延时: "且",
+    "或延时": "或",
+    "与延时": "且",
   },
 
-  // 跳过的表头
+  // 跳过的表头（不处理的行）
   SKIP_HEADERS: ["序号", "条件确认"],
 
-  // 段落标题
+  // 段落标题（这些标题下的内容不进行逻辑转换）
   SECTION_HEADERS: ["试验条件", "试验恢复", "结论", "存在问题"],
 };
-
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = DCS_CONFIG;
-}

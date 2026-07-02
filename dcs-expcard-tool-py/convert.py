@@ -6,7 +6,7 @@ import re
 import openpyxl
 
 
-class DCSConverter:
+class ExpCardConverter:
 
     SKIP_HEADERS = ['序号', '条件确认']
     SECTION_HEADERS = ['试验条件', '试验恢复', '结论', '存在问题']
@@ -732,7 +732,7 @@ class DCSConverter:
 
 
 def convert_sheet(file_path, sheet_index=0, mode='old'):
-    converter = DCSConverter()
+    converter = ExpCardConverter()
     if mode == 'new':
         return converter.convert_new(file_path, sheet_index)
     return converter.convert(file_path, sheet_index)
