@@ -5,6 +5,7 @@ __pycache__/
 
 # 大型可执行文件
 mimo.exe
+pandoc.exe
 
 # IDE/编辑器配置
 .vscode/
