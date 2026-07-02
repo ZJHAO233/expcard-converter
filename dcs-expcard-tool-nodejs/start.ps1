@@ -37,41 +37,25 @@ function Show-Loading {
 
 function Show-Menu {
     Write-Host ""
-    Write-Host "  +========================================================+" -ForegroundColor DarkCyan
-    Write-Host "  |  " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "    ____    ______   _____    _    ____  _____            " -ForegroundColor White
-    Write-Host "  |  " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "   |  _ \  / ___| | |_   _|  / \  / ___|| ____|           " -ForegroundColor White
-    Write-Host "  |  " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "   | |_) | |  _  |   | |   / _ \| |  _ |  _|             " -ForegroundColor White
-    Write-Host "  |  " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "   |  __/| |_| |   | |  / ___ \ |_| || |___            " -ForegroundColor White
-    Write-Host "  |  " -ForegroundColor DarkCyan -NoNewline
-    Write-Host "   |_|    \____|   |_| /_/   \_\____/ |_____|           " -ForegroundColor White
-    Write-Host "  |                                                        " -ForegroundColor DarkCyan
-    Write-Host "  +========================================================+" -ForegroundColor DarkCyan
-    Write-Host ""
-    Write-Host "       [ " -NoNewline
-    Write-Host "1" -ForegroundColor Green -NoNewline
-    Write-Host " ] " -NoNewline
-    Write-Host "启动服务" -ForegroundColor White
-    Write-Host ""
-    Write-Host "       [ " -NoNewline
-    Write-Host "2" -ForegroundColor Yellow -NoNewline
-    Write-Host " ] " -NoNewline
-    Write-Host "编辑配置" -ForegroundColor White
-    Write-Host ""
-    Write-Host "       [ " -NoNewline
-    Write-Host "3" -ForegroundColor Cyan -NoNewline
-    Write-Host " ] " -NoNewline
-    Write-Host "使用帮助" -ForegroundColor White
-    Write-Host ""
-    Write-Host "       [ " -NoNewline
-    Write-Host "0" -ForegroundColor Red -NoNewline
-    Write-Host " ] " -NoNewline
-    Write-Host "退出程序" -ForegroundColor White
-    Write-Host ""
-    Write-Host "  =========================================================" -ForegroundColor DarkCyan
+    Write-Host "  +--------------------------------------------------------+" -ForegroundColor White
+    Write-Host "  |                                                        |" -ForegroundColor White
+    Write-Host "  |    " -ForegroundColor White -NoNewline
+    Write-Host "[ 1 ]" -ForegroundColor Green -NoNewline
+    Write-Host "  启动服务                                  |" -ForegroundColor White
+    Write-Host "  |                                                        |" -ForegroundColor White
+    Write-Host "  |    " -ForegroundColor White -NoNewline
+    Write-Host "[ 2 ]" -ForegroundColor Yellow -NoNewline
+    Write-Host "  编辑配置                                  |" -ForegroundColor White
+    Write-Host "  |                                                        |" -ForegroundColor White
+    Write-Host "  |    " -ForegroundColor White -NoNewline
+    Write-Host "[ 3 ]" -ForegroundColor Cyan -NoNewline
+    Write-Host "  使用帮助                                  |" -ForegroundColor White
+    Write-Host "  |                                                        |" -ForegroundColor White
+    Write-Host "  |    " -ForegroundColor White -NoNewline
+    Write-Host "[ 0 ]" -ForegroundColor Red -NoNewline
+    Write-Host "  退出程序                                  |" -ForegroundColor White
+    Write-Host "  |                                                        |" -ForegroundColor White
+    Write-Host "  +--------------------------------------------------------+" -ForegroundColor White
     Write-Host ""
 }
 
