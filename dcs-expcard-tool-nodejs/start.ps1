@@ -3,7 +3,6 @@ $Host.UI.RawUI.WindowTitle = "ExpCard Converter"
 $OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-# 默认端口
 $script:ServerPort = 3210
 
 function Show-Banner {
@@ -18,7 +17,6 @@ function Show-Banner {
     Write-Host "  ========================================================" -ForegroundColor Cyan
     Write-Host "                  试验卡数据提取工具                       " -ForegroundColor Yellow
     Write-Host "  ========================================================" -ForegroundColor Cyan
-    Write-Host "                  端口: $($script:ServerPort)                                " -ForegroundColor DarkGray
 }
 
 function Show-Loading {
@@ -39,66 +37,42 @@ function Show-Loading {
 
 function Show-Menu {
     Write-Host ""
-    Write-Host "  +--------------------------------------------------------+" -ForegroundColor White
-    Write-Host "  |                                                        |" -ForegroundColor White
-    Write-Host "  |    " -ForegroundColor White -NoNewline
-    Write-Host "[ 1 ]" -ForegroundColor Green -NoNewline
-    Write-Host "  启动服务                                  |" -ForegroundColor White
-    Write-Host "  |                                                        |" -ForegroundColor White
-    Write-Host "  |    " -ForegroundColor White -NoNewline
-    Write-Host "[ 2 ]" -ForegroundColor Yellow -NoNewline
-    Write-Host "  编辑配置                                  |" -ForegroundColor White
-    Write-Host "  |                                                        |" -ForegroundColor White
-    Write-Host "  |    " -ForegroundColor White -NoNewline
-    Write-Host "[ 3 ]" -ForegroundColor Cyan -NoNewline
-    Write-Host "  使用帮助                                  |" -ForegroundColor White
-    Write-Host "  |                                                        |" -ForegroundColor White
-    Write-Host "  |    " -ForegroundColor White -NoNewline
-    Write-Host "[ 4 ]" -ForegroundColor Magenta -NoNewline
-    Write-Host "  设置端口                                  |" -ForegroundColor White
-    Write-Host "  |                                                        |" -ForegroundColor White
-    Write-Host "  |    " -ForegroundColor White -NoNewline
-    Write-Host "[ 0 ]" -ForegroundColor Red -NoNewline
-    Write-Host "  退出程序                                  |" -ForegroundColor White
-    Write-Host "  |                                                        |" -ForegroundColor White
-    Write-Host "  +--------------------------------------------------------+" -ForegroundColor White
+    Write-Host "  +========================================================+" -ForegroundColor DarkCyan
+    Write-Host "  |  " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "    ____    ______   _____    _    ____  _____            " -ForegroundColor White
+    Write-Host "  |  " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "   |  _ \  / ___| | |_   _|  / \  / ___|| ____|           " -ForegroundColor White
+    Write-Host "  |  " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "   | |_) | |  _  |   | |   / _ \| |  _ |  _|             " -ForegroundColor White
+    Write-Host "  |  " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "   |  __/| |_| |   | |  / ___ \ |_| || |___            " -ForegroundColor White
+    Write-Host "  |  " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "   |_|    \____|   |_| /_/   \_\____/ |_____|           " -ForegroundColor White
+    Write-Host "  |                                                        " -ForegroundColor DarkCyan
+    Write-Host "  +========================================================+" -ForegroundColor DarkCyan
     Write-Host ""
-}
-
-function Set-Port {
-    Clear-Host
+    Write-Host "       [ " -NoNewline
+    Write-Host "1" -ForegroundColor Green -NoNewline
+    Write-Host " ] " -NoNewline
+    Write-Host "启动服务" -ForegroundColor White
     Write-Host ""
-    Write-Host "  ========================================================" -ForegroundColor Magenta
-    Write-Host "                      设置端口号                            " -ForegroundColor Magenta
-    Write-Host "  ========================================================" -ForegroundColor Magenta
+    Write-Host "       [ " -NoNewline
+    Write-Host "2" -ForegroundColor Yellow -NoNewline
+    Write-Host " ] " -NoNewline
+    Write-Host "编辑配置" -ForegroundColor White
     Write-Host ""
-    Write-Host "  当前端口  : " -NoNewline
-    Write-Host "$($script:ServerPort)" -ForegroundColor Yellow
+    Write-Host "       [ " -NoNewline
+    Write-Host "3" -ForegroundColor Cyan -NoNewline
+    Write-Host " ] " -NoNewline
+    Write-Host "使用帮助" -ForegroundColor White
     Write-Host ""
-    Write-Host "  默认端口  : 3210" -ForegroundColor Gray
-    Write-Host "  建议范围  : 1024 - 65535" -ForegroundColor Gray
+    Write-Host "       [ " -NoNewline
+    Write-Host "0" -ForegroundColor Red -NoNewline
+    Write-Host " ] " -NoNewline
+    Write-Host "退出程序" -ForegroundColor White
     Write-Host ""
-    Write-Host "  ---------------------------------------------------------" -ForegroundColor DarkGray
+    Write-Host "  =========================================================" -ForegroundColor DarkCyan
     Write-Host ""
-    
-    $newPort = Read-Host "  输入新端口 (回车保持当前)"
-    
-    if ($newPort -eq "") {
-        Write-Host ""
-        Write-Host "  保持当前端口: $($script:ServerPort)" -ForegroundColor Yellow
-    } elseif ($newPort -match "^\d+$" -and [int]$newPort -ge 1024 -and [int]$newPort -le 65535) {
-        $script:ServerPort = [int]$newPort
-        Write-Host ""
-        Write-Host "  端口已修改为: $($script:ServerPort)" -ForegroundColor Green
-    } else {
-        Write-Host ""
-        Write-Host "  [错误] 无效端口号!" -ForegroundColor Red
-        Write-Host "  请输入 1024-65535 之间的数字" -ForegroundColor Yellow
-    }
-    
-    Write-Host ""
-    Pause
-    Show-MenuLoop
 }
 
 function Start-Server {
@@ -179,7 +153,6 @@ function Start-Server {
 
     Show-Loading -Message "正在启动服务器，请稍候..." -Seconds 3
 
-    # 后台启动服务，传递端口参数
     if (Test-Path $exePath) {
         $env:PORT = $script:ServerPort
         $process = Start-Process -FilePath $exePath -PassThru -WindowStyle Hidden
@@ -261,25 +234,21 @@ function Show-Help {
     Write-Host "                        使用帮助                            " -ForegroundColor Cyan
     Write-Host "  ========================================================" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "  快速开始  :" -ForegroundColor White
-    Write-Host "    1. 双击 start.bat 或 start.ps1 启动" -ForegroundColor Gray
-    Write-Host "    2. 在浏览器中访问 http://localhost:3210" -ForegroundColor Gray
-    Write-Host "    3. 上传 .xlsx 格式的试验卡文件" -ForegroundColor Gray
-    Write-Host "    4. 选择工作表和转换范围" -ForegroundColor Gray
-    Write-Host "    5. 点击「转换」按钮" -ForegroundColor Gray
-    Write-Host "    6. 预览并导出结果" -ForegroundColor Gray
+    Write-Host "  使用步骤  :" -ForegroundColor White
     Write-Host ""
-    Write-Host "  支持模式  :" -ForegroundColor White
-    Write-Host "    - 子序号模式 (x.y 格式编号)" -ForegroundColor Gray
-    Write-Host "    - 纯数字模式 (列嵌套)" -ForegroundColor Gray
+    Write-Host "    1. 双击 start.ps1 启动程序" -ForegroundColor Gray
+    Write-Host "    2. 选择 [1] 启动服务" -ForegroundColor Gray
+    Write-Host "    3. 浏览器会自动打开" -ForegroundColor Gray
+    Write-Host "    4. 拖入或点击上传 Excel 文件" -ForegroundColor Gray
+    Write-Host "    5. 选择要转换的工作表" -ForegroundColor Gray
+    Write-Host "    6. 点击「转换」按钮" -ForegroundColor Gray
+    Write-Host "    7. 预览结果并导出" -ForegroundColor Gray
     Write-Host ""
-    Write-Host "  特殊分隔符:" -ForegroundColor White
-    Write-Host "    - 或延时xxx 转换为 或" -ForegroundColor Gray
-    Write-Host "    - 与延时xxx 转换为 且" -ForegroundColor Gray
+    Write-Host "  注意事项  :" -ForegroundColor White
     Write-Host ""
-    Write-Host "  导出格式  :" -ForegroundColor White
-    Write-Host "    - Markdown (.md)" -ForegroundColor Gray
-    Write-Host "    - Word (.docx)" -ForegroundColor Gray
+    Write-Host "    - 文件格式: 仅支持 .xlsx 格式" -ForegroundColor Gray
+    Write-Host "    - 若您的文件是 .xls 格式，请先用 Excel 另存为 .xlsx" -ForegroundColor Gray
+    Write-Host "    - 关闭启动窗口将停止服务" -ForegroundColor Gray
     Write-Host ""
     Write-Host "  ---------------------------------------------------------" -ForegroundColor DarkGray
     Write-Host ""
@@ -290,13 +259,12 @@ function Show-Help {
 function Show-MenuLoop {
     Show-Banner
     Show-Menu
-    $choice = Read-Host "  请选择 [0-4]"
+    $choice = Read-Host "  请选择 [0-3]"
     
     switch ($choice) {
         "1" { Start-Server }
         "2" { Show-Config }
         "3" { Show-Help }
-        "4" { Set-Port }
         "0" {
             Write-Host ""
             Write-Host "  再见!" -ForegroundColor Green
