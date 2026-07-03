@@ -13,6 +13,25 @@ const CONFIG_NAME = 'sea-config.json';
 const BUNDLE_NAME = 'server.bundle.js';
 const EMBEDDED_NAME = 'server-embedded.js';
 
+function copyWithRetry(src, dest, retries = 5) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const tmp = dest + '.tmp';
+      fs.copyFileSync(src, tmp);
+      try { fs.unlinkSync(dest); } catch (_) {}
+      fs.renameSync(tmp, dest);
+      return;
+    } catch (e) {
+      if (i < retries - 1) {
+        try { execSync('taskkill /f /im ' + path.basename(dest), { stdio: 'ignore' }); } catch (_) {}
+        execSync('ping -n 2 127.0.0.1 >nul', { stdio: 'ignore' });
+      } else {
+        throw e;
+      }
+    }
+  }
+}
+
 console.log('开始 SEA 打包...\n');
 
 const nodeVersion = parseInt(process.version.slice(1));
@@ -98,9 +117,9 @@ require('fs').existsSync = function(filePath) {
   const distDir = path.join(__dirname, 'dist');
   if (!fs.existsSync(distDir)) fs.mkdirSync(distDir);
   
-  fs.copyFileSync(EXE_NAME, path.join(distDir, EXE_NAME));
+  copyWithRetry(EXE_NAME, path.join(distDir, EXE_NAME));
   ['config.js', 'pandoc.exe', 'start.bat', 'start.ps1'].forEach(f => {
-    if (fs.existsSync(f)) fs.copyFileSync(f, path.join(distDir, f));
+    if (fs.existsSync(f)) copyWithRetry(f, path.join(distDir, f));
   });
 
   const launcherBat = `@echo off\r\npowershell -ExecutionPolicy Bypass -File "%~dp0start.ps1"\r\n`;

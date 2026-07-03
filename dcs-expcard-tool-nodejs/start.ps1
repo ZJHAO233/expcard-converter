@@ -1,4 +1,4 @@
-﻿if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Start-Process powershell.exe "-ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
     exit
 }
@@ -144,9 +144,9 @@ function Start-Server {
 
     if (Test-Path $exePath) {
         $env:PORT = $script:ServerPort
-        $process = Start-Process -FilePath $exePath -PassThru -WindowStyle Hidden
+        $script:serverProcess = Start-Process -FilePath $exePath -PassThru -WindowStyle Hidden
     } else {
-        $process = Start-Process -FilePath "node" -ArgumentList "server.js" -PassThru -WindowStyle Hidden -Environment @{PORT=$script:ServerPort}
+        $script:serverProcess = Start-Process -FilePath "node" -ArgumentList "server.js" -PassThru -WindowStyle Hidden -Environment @{PORT=$script:ServerPort}
     }
 
     $maxWait = 10
@@ -171,10 +171,14 @@ function Start-Server {
     Write-Host ""
     
     try {
-        $process.WaitForExit()
+        $script:serverProcess.WaitForExit()
     } catch {
         Write-Host ""
         Write-Host "  服务已停止" -ForegroundColor Yellow
+    } finally {
+        if ($script:serverProcess -and !$script:serverProcess.HasExited) {
+            Stop-Process -Id $script:serverProcess.Id -Force -ErrorAction SilentlyContinue
+        }
     }
     
     Show-MenuLoop
@@ -264,7 +268,14 @@ function Show-MenuLoop {
             Write-Host ""
             Write-Host "  [错误] 无效选项!" -ForegroundColor Red
             Start-Sleep -Seconds 1
-            Show-MenuLoop
+Show-MenuLoop
+
+# 全局退出清理：关闭窗口时自动杀掉子进程
+Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action {
+    if ($script:serverProcess -and !$script:serverProcess.HasExited) {
+        Stop-Process -Id $script:serverProcess.Id -Force -ErrorAction SilentlyContinue
+    }
+} | Out-Null
         }
     }
 }
