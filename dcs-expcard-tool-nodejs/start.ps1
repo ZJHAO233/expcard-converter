@@ -1,18 +1,4 @@
-$scriptPath = $MyInvocation.MyCommand.Definition
-if (-not $scriptPath) { $scriptPath = $PSCommandPath }
-if (-not $scriptPath) { $scriptPath = $PSScriptRoot + "\start.ps1" }
-
-if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    try {
-        Start-Process powershell.exe "-ExecutionPolicy Bypass -File `"$scriptPath`"" -Verb RunAs -ErrorAction Stop
-        exit
-    } catch {
-        Write-Host "  需要管理员权限，请在弹出的 UAC 窗口中点击「是」" -ForegroundColor Yellow
-        Start-Sleep -Seconds 3
-    }
-}
-
-# ExpCard Converter - PowerShell Launcher
+﻿# ExpCard Converter - PowerShell Launcher
 $Host.UI.RawUI.WindowTitle = "ExpCard Converter"
 $OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
