@@ -1,9 +1,16 @@
-﻿# ExpCard Converter - PowerShell Launcher
+# ExpCard Converter - PowerShell Launcher
 $Host.UI.RawUI.WindowTitle = "ExpCard Converter"
 $OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 $script:ServerPort = 3210
+
+# 全局退出清理：Ctrl+C 或关闭窗口时杀子进程
+Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action {
+    if ($script:serverProcess -and !$script:serverProcess.HasExited) {
+        Stop-Process -Id $script:serverProcess.Id -Force -ErrorAction SilentlyContinue
+    }
+} | Out-Null
 
 function Show-Banner {
     Clear-Host
@@ -261,16 +268,15 @@ function Show-MenuLoop {
             Write-Host ""
             Write-Host "  [错误] 无效选项!" -ForegroundColor Red
             Start-Sleep -Seconds 1
-            Show-MenuLoop
+try {
+    Show-MenuLoop
+} finally {
+    if ($script:serverProcess -and !$script:serverProcess.HasExited) {
+        Stop-Process -Id $script:serverProcess.Id -Force -ErrorAction SilentlyContinue
+    }
+}
         }
     }
 }
 
 Show-MenuLoop
-
-# 全局退出清理：关闭窗口时自动杀掉子进程
-Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action {
-    if ($script:serverProcess -and !$script:serverProcess.HasExited) {
-        Stop-Process -Id $script:serverProcess.Id -Force -ErrorAction SilentlyContinue
-    }
-} | Out-Null
