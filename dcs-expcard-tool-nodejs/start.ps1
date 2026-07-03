@@ -135,8 +135,6 @@ function Start-Server {
     Write-Host ""
     Write-Host "  ---------------------------------------------------------" -ForegroundColor DarkGray
 
-    Show-Loading -Message "正在启动服务器，请稍候..." -Seconds 3
-
     if (Test-Path $exePath) {
         $env:PORT = $script:ServerPort
         $script:serverProcess = Start-Process -FilePath $exePath -PassThru -WindowStyle Hidden
