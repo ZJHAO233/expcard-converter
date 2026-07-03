@@ -1,6 +1,15 @@
+$scriptPath = $MyInvocation.MyCommand.Definition
+if (-not $scriptPath) { $scriptPath = $PSCommandPath }
+if (-not $scriptPath) { $scriptPath = $PSScriptRoot + "\start.ps1" }
+
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Start-Process powershell.exe "-ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
-    exit
+    try {
+        Start-Process powershell.exe "-ExecutionPolicy Bypass -File `"$scriptPath`"" -Verb RunAs -ErrorAction Stop
+        exit
+    } catch {
+        Write-Host "  需要管理员权限，请在弹出的 UAC 窗口中点击「是」" -ForegroundColor Yellow
+        Start-Sleep -Seconds 3
+    }
 }
 
 # ExpCard Converter - PowerShell Launcher
@@ -268,6 +277,11 @@ function Show-MenuLoop {
             Write-Host ""
             Write-Host "  [错误] 无效选项!" -ForegroundColor Red
             Start-Sleep -Seconds 1
+            Show-MenuLoop
+        }
+    }
+}
+
 Show-MenuLoop
 
 # 全局退出清理：关闭窗口时自动杀掉子进程
@@ -276,8 +290,3 @@ Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action {
         Stop-Process -Id $script:serverProcess.Id -Force -ErrorAction SilentlyContinue
     }
 } | Out-Null
-        }
-    }
-}
-
-Show-MenuLoop
