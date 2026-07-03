@@ -99,9 +99,12 @@ require('fs').existsSync = function(filePath) {
   if (!fs.existsSync(distDir)) fs.mkdirSync(distDir);
   
   fs.copyFileSync(EXE_NAME, path.join(distDir, EXE_NAME));
-  ['config.js', 'pandoc.exe', 'start.bat'].forEach(f => {
+  ['config.js', 'pandoc.exe', 'start.bat', 'start.ps1'].forEach(f => {
     if (fs.existsSync(f)) fs.copyFileSync(f, path.join(distDir, f));
   });
+
+  const launcherBat = `@echo off\r\npowershell -ExecutionPolicy Bypass -File "%~dp0start.ps1"\r\n`;
+  fs.writeFileSync(path.join(distDir, '启动.bat'), launcherBat, 'ascii');
   console.log('已复制到 dist 目录\n');
 
   // 清理
@@ -111,6 +114,7 @@ require('fs').existsSync = function(filePath) {
   });
 
   console.log('\n打包完成！输出目录: dist/');
+  execSync('explorer "' + distDir + '"');
 
 } catch (error) {
   console.error('\n打包失败:', error.message);

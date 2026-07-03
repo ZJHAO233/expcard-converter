@@ -2,6 +2,7 @@
 title ExpCard Converter
 color 0B
 mode con: cols=58 lines=35
+cd /d "%~dp0"
 
 :menu
 cls
@@ -58,18 +59,41 @@ echo    -----------------------------------------------------
 echo.
 
 if exist "expcard-converter.exe" (
+    echo    [Info] Running packaged version...
+    echo.
     expcard-converter.exe
+    if errorlevel 1 (
+        echo.
+        echo    [ERROR] Server crashed! Error code: %errorlevel%
+        echo    Please ensure:
+        echo      1. No antivirus is blocking the program
+        echo      2. Visual C++ Redistributable is installed
+        echo         Download: https://aka.ms/vs/17/release/vc_redist.x64.exe
+        echo.
+        pause
+        goto menu
+    )
 ) else (
+    echo    [Info] Packaged version not found, using Node.js...
+    echo.
     node -v >nul 2>&1
     if errorlevel 1 (
-        echo    [!] Node.js not found!
+        echo    [ERROR] Node.js not found!
         echo        Download: https://nodejs.org/
+        echo.
         pause
-        exit /b 1
+        goto menu
     )
     node server.js
+    if errorlevel 1 (
+        echo.
+        echo    [ERROR] Server crashed! Error code: %errorlevel%
+        echo.
+        pause
+        goto menu
+    )
 )
-goto end
+goto menu
 
 :config
 cls
