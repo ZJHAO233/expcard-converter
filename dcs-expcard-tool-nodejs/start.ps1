@@ -1,11 +1,9 @@
-# ExpCard Converter - PowerShell Launcher
-$Host.UI.RawUI.WindowTitle = "ExpCard Converter"
+﻿$Host.UI.RawUI.WindowTitle = "ExpCard Converter"
 $OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 $script:ServerPort = 3210
 
-# 全局退出清理：Ctrl+C 或关闭窗口时杀子进程
 Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action {
     if ($script:serverProcess -and !$script:serverProcess.HasExited) {
         Stop-Process -Id $script:serverProcess.Id -Force -ErrorAction SilentlyContinue
@@ -24,22 +22,6 @@ function Show-Banner {
     Write-Host "  ========================================================" -ForegroundColor Cyan
     Write-Host "                  试验卡数据提取工具                       " -ForegroundColor Yellow
     Write-Host "  ========================================================" -ForegroundColor Cyan
-}
-
-function Show-Loading {
-    param([string]$Message, [int]$Seconds = 3)
-    Write-Host ""
-    Write-Host "  $Message" -ForegroundColor Cyan
-    Write-Host ""
-    for ($i = 0; $i -lt $Seconds; $i++) {
-        $percent = [math]::Round(($i + 1) / $Seconds * 100)
-        $filled = [math]::Round(($i + 1) / $Seconds * 30)
-        $empty = 30 - $filled
-        $bar = "[" + ("=" * $filled) + (" " * $empty) + "]"
-        Write-Host "`r  $bar $percent%" -NoNewline -ForegroundColor Green
-        Start-Sleep -Seconds 1
-    }
-    Write-Host ""
 }
 
 function Show-Menu {
@@ -98,7 +80,7 @@ function Start-Server {
 
     $exePath = Join-Path $PSScriptRoot "expcard-converter.exe"
     $serverPath = Join-Path $PSScriptRoot "server.js"
-    
+
     if (Test-Path $exePath) {
         Write-Host "  [ 3/4 ] " -NoNewline -ForegroundColor DarkGray
         Write-Host "检测程序文件..." -NoNewline -ForegroundColor White
@@ -115,7 +97,6 @@ function Start-Server {
         Write-Host "  [错误] 请确保 expcard-converter.exe 或 server.js 存在" -ForegroundColor Red
         Write-Host ""
         Pause
-        Show-MenuLoop
         return
     }
 
@@ -169,7 +150,7 @@ function Start-Server {
     Write-Host ""
     Write-Host "  按 Ctrl+C 停止服务，或关闭此窗口" -ForegroundColor DarkGray
     Write-Host ""
-    
+
     try {
         $script:serverProcess.WaitForExit()
     } catch {
@@ -180,8 +161,6 @@ function Start-Server {
             Stop-Process -Id $script:serverProcess.Id -Force -ErrorAction SilentlyContinue
         }
     }
-    
-    Show-MenuLoop
 }
 
 function Show-Config {
@@ -217,7 +196,6 @@ function Show-Config {
         Write-Host ""
         Pause
     }
-    Show-MenuLoop
 }
 
 function Show-Help {
@@ -246,14 +224,13 @@ function Show-Help {
     Write-Host "  ---------------------------------------------------------" -ForegroundColor DarkGray
     Write-Host ""
     Pause
-    Show-MenuLoop
 }
 
 function Show-MenuLoop {
     Show-Banner
     Show-Menu
     $choice = Read-Host "  请选择 [0-3]"
-    
+
     switch ($choice) {
         "1" { Start-Server }
         "2" { Show-Config }
@@ -268,6 +245,11 @@ function Show-MenuLoop {
             Write-Host ""
             Write-Host "  [错误] 无效选项!" -ForegroundColor Red
             Start-Sleep -Seconds 1
+        }
+    }
+    Show-MenuLoop
+}
+
 try {
     Show-MenuLoop
 } finally {
@@ -275,8 +257,3 @@ try {
         Stop-Process -Id $script:serverProcess.Id -Force -ErrorAction SilentlyContinue
     }
 }
-        }
-    }
-}
-
-Show-MenuLoop
