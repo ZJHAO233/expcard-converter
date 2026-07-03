@@ -661,18 +661,82 @@
             font-size: 14px;
             font-weight: 700;
             color: var(--text-primary);
-            padding: 12px 16px;
-            background: var(--surface);
+            padding: 14px 16px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%);
             border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.5);
             border: 1px solid var(--border);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            cursor: default;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-logo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .sidebar-logo:hover::before {
+            left: 100%;
+        }
+
+        .sidebar-logo:hover {
+            box-shadow: var(--shadow), 0 0 20px rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.3);
         }
 
         .sidebar-logo-icon {
-            color: var(--primary);
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--primary) 0%, #a855f7 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+            flex-shrink: 0;
+        }
+
+        .sidebar-logo-icon svg {
+            width: 16px;
+            height: 16px;
+            color: white;
+        }
+
+        .sidebar-logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .sidebar-logo-text .logo-title {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            background: linear-gradient(135deg, var(--primary) 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sidebar-logo-text .logo-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         .section-label {
@@ -2181,7 +2245,25 @@
 
             .sidebar-logo {
                 padding: 10px 14px;
-                font-size: 13px;
+            }
+
+            .sidebar-logo-icon {
+                width: 24px;
+                height: 24px;
+                border-radius: 6px;
+            }
+
+            .sidebar-logo-icon svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            .sidebar-logo-text .logo-title {
+                font-size: 12px;
+            }
+
+            .sidebar-logo-text .logo-subtitle {
+                font-size: 8px;
             }
 
             /* 控制面板大框 */
@@ -2307,12 +2389,19 @@
     <div class="app-container">
         <div class="sidebar">
             <div class="sidebar-logo">
-                <svg class="sidebar-logo-icon" viewBox="0 0 1024 1024" width="20" height="20">
-                    <path fill="currentColor" d="M819.2 187.733333H477.866667a17.066667 17.066667 0 0 0 0 34.133334h341.333333a17.066667 17.066667 0 0 0 0-34.133334zM819.2 324.266667H477.866667a17.066667 17.066667 0 0 0 0 34.133333h341.333333a17.066667 17.066667 0 0 0 0-34.133333zM819.2 460.8h-204.8a17.066667 17.066667 0 0 0 0 34.133333h204.8a17.066667 17.066667 0 0 0 0-34.133333zM819.2 597.333333h-136.533333a17.066667 17.066667 0 0 0 0 34.133334h136.533333a17.066667 17.066667 0 0 0 0-34.133334z"/>
-                    <path fill="currentColor" d="M863.9488 34.133333H467.2512A126.020267 126.020267 0 0 0 341.333333 160.0512V204.8H160.0512A126.020267 126.020267 0 0 0 34.133333 330.717867v533.230933A126.020267 126.020267 0 0 0 160.0512 989.866667h396.6976A126.020267 126.020267 0 0 0 682.666667 863.9488V819.2h181.282133A126.020267 126.020267 0 0 0 989.866667 693.282133V160.0512A126.020267 126.020267 0 0 0 863.9488 34.133333z m85.265067 659.114667a85.367467 85.367467 0 0 1-85.265067 85.265067H467.2512a85.333333 85.333333 0 0 1-85.230933-85.265067v-8.977067c-13.858133 7.304533-26.965333 15.940267-39.150934 25.873067A125.781333 125.781333 0 0 0 467.2512 819.2h174.762667v44.714667a85.367467 85.367467 0 0 1-85.265067 85.265066H160.0512a85.333333 85.333333 0 0 1-85.230933-85.265066V330.683733a85.333333 85.333333 0 0 1 85.230933-85.230933v0.034133H341.333333v133.248c13.277867-5.3248 26.862933-9.966933 40.686934-13.892266V160.017067a85.333333 85.333333 0 0 1 85.230933-85.230934v0.034134h396.6976a85.333333 85.333333 0 0 1 85.265067 85.230933V693.248z"/>
-                    <path fill="currentColor" d="M562.926933 514.116267c0.682667-1.058133 1.604267-1.911467 2.048-3.072a20.718933 20.718933 0 0 0 1.604267-7.9872c0-0.3072-0.170667-0.546133-0.170667-0.853334 0-0.2048 0.136533-0.4096 0.1024-0.6144-0.034133-0.580267-0.443733-0.989867-0.546133-1.570133a19.899733 19.899733 0 0 0-10.103467-14.6432l-0.136533-0.1024-0.2048-0.1024c-0.7168-0.375467-1.3312-0.8192-2.082133-1.092267l-126.3616-66.935466a20.48 20.48 0 1 0-19.1488 36.215466l55.227733 29.252267h-5.700267a342.869333 342.869333 0 0 0-295.048533 169.506133 20.48 20.48 0 1 0 35.396267 20.650667 301.806933 301.806933 0 0 1 259.6864-149.230933h29.320533l-68.061867 52.872533a20.445867 20.445867 0 1 0 25.156267 32.324267l114.858667-89.224534c0.512-0.375467 0.682667-1.024 1.160533-1.467733 1.160533-1.1264 2.082133-2.525867 3.003733-3.925333z"/>
-                </svg>
-                <span style="font-family: 'Courier New', monospace; font-weight: bold; font-size: 14px; letter-spacing: 1px;">EXP CARD</span>
+                <div class="sidebar-logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                </div>
+                <div class="sidebar-logo-text">
+                    <span class="logo-title">EXP CARD</span>
+                    <span class="logo-subtitle">converter</span>
+                </div>
             </div>
 
             <div class="control-panel">
