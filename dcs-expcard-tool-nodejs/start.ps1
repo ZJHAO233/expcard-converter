@@ -3,10 +3,31 @@ $OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 $script:ServerPort = 3210
+$global:serverProcess = $null
+
+function Stop-ServerProcess {
+    $proc = $null
+    if ($global:serverProcess -and !$global:serverProcess.HasExited) {
+        $proc = $global:serverProcess
+    }
+    if ($proc) {
+        try { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue } catch {}
+    }
+    $portInUse = Get-NetTCPConnection -LocalPort $script:ServerPort -ErrorAction SilentlyContinue
+    if ($portInUse) {
+        foreach ($conn in $portInUse) {
+            try { Stop-Process -Id $conn.OwningProcess -Force -ErrorAction SilentlyContinue } catch {}
+        }
+    }
+}
 
 Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action {
-    if ($script:serverProcess -and !$script:serverProcess.HasExited) {
-        Stop-Process -Id $script:serverProcess.Id -Force -ErrorAction SilentlyContinue
+    $p = Get-Variable -Name serverProcess -Scope Global -ErrorAction SilentlyContinue
+    if ($p -and $p.Value -and !$p.Value.HasExited) {
+        try { Stop-Process -Id $p.Value.Id -Force -ErrorAction SilentlyContinue } catch {}
+    }
+    Get-NetTCPConnection -LocalPort 3210 -ErrorAction SilentlyContinue | ForEach-Object {
+        try { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue } catch {}
     }
 } | Out-Null
 
@@ -125,9 +146,9 @@ function Start-Server {
 
     if (Test-Path $exePath) {
         $env:PORT = $script:ServerPort
-        $script:serverProcess = Start-Process -FilePath $exePath -PassThru -WindowStyle Hidden
+        $global:serverProcess = Start-Process -FilePath $exePath -PassThru -WindowStyle Hidden
     } else {
-        $script:serverProcess = Start-Process -FilePath "node" -ArgumentList "server.js" -PassThru -WindowStyle Hidden -Environment @{PORT=$script:ServerPort}
+        $global:serverProcess = Start-Process -FilePath "node" -ArgumentList "server.js" -PassThru -WindowStyle Hidden -Environment @{PORT=$script:ServerPort}
     }
 
     $maxWait = 10
@@ -152,14 +173,16 @@ function Start-Server {
     Write-Host ""
 
     try {
-        $script:serverProcess.WaitForExit()
-    } catch {
+        while (!$global:serverProcess.HasExited) {
+            Start-Sleep -Milliseconds 200
+        }
+    } finally {
+        Stop-ServerProcess
+        $global:serverProcess = $null
         Write-Host ""
         Write-Host "  服务已停止" -ForegroundColor Yellow
-    } finally {
-        if ($script:serverProcess -and !$script:serverProcess.HasExited) {
-            Stop-Process -Id $script:serverProcess.Id -Force -ErrorAction SilentlyContinue
-        }
+        Write-Host ""
+        Pause
     }
 }
 
@@ -253,7 +276,6 @@ function Show-MenuLoop {
 try {
     Show-MenuLoop
 } finally {
-    if ($script:serverProcess -and !$script:serverProcess.HasExited) {
-        Stop-Process -Id $script:serverProcess.Id -Force -ErrorAction SilentlyContinue
-    }
+    Stop-ServerProcess
+    $global:serverProcess = $null
 }
