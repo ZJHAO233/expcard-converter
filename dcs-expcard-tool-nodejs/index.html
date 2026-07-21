@@ -2801,31 +2801,10 @@
                     <button class="config-btn" id="addSpecialSeparator" style="margin-top:8px;">+ 添加</button>
                 </div>
 
-                <!-- 跳过的表头 -->
-                <div class="config-section">
-                    <div class="config-section-title">跳过的表头</div>
-                    <div class="config-section-desc">A列精确匹配这些值时，跳过该行</div>
-                    <div class="config-tag-list" id="skipHeadersList"></div>
-                </div>
-
-                <!-- 段落标题 -->
-                <div class="config-section">
-                    <div class="config-section-title">段落标题</div>
-                    <div class="config-section-desc">这些标题下的内容不进行逻辑转换</div>
-                    <div class="config-tag-list" id="sectionHeadersList"></div>
-                </div>
-
-                <!-- 内容起始标记 -->
-                <div class="config-section">
-                    <div class="config-section-title">内容区域起始标记</div>
-                    <div class="config-section-desc">A列匹配此标记时，开始处理后续内容行</div>
-                    <div class="config-tag-list" id="contentStartList"></div>
-                </div>
-
                 <!-- 行识别规则 -->
                 <div class="config-section">
                     <div class="config-section-title">行识别规则</div>
-                    <div class="config-section-desc">定义各类行的识别条件（支持 exact/regex/startsWith 三种类型）</div>
+                    <div class="config-section-desc">定义各类行的识别条件（支持精确匹配、正则匹配、前缀匹配三种类型）</div>
                     <div id="rowPatternsList"></div>
                 </div>
             </div>
@@ -3431,9 +3410,6 @@
         const DEFAULT_CONFIG = {
             LOGIC_OPERATORS: { '与': '且', '且': '且', '或': '或', '或取反': '或取反' },
             SPECIAL_SEPARATORS: { '或延时': '或', '与延时': '且' },
-            SKIP_HEADERS: ['序号', '条件确认'],
-            SECTION_HEADERS: ['试验条件', '试验恢复', '结论', '存在问题'],
-            CONTENT_START: ['试验内容'],
             ROW_PATTERNS: {
                 header: { type: 'exact', values: ['序号', '条件确认'] },
                 chineseTitle: { type: 'regex', pattern: '^[一二三四五六七八九十]+、' },
@@ -3487,9 +3463,6 @@
         function renderConfigPanel() {
             renderLogicOperators();
             renderSpecialSeparators();
-            renderTagList('skipHeadersList', currentConfig.SKIP_HEADERS, 'skipHeaders');
-            renderTagList('sectionHeadersList', currentConfig.SECTION_HEADERS, 'sectionHeaders');
-            renderTagList('contentStartList', currentConfig.CONTENT_START, 'contentStart');
             renderRowPatterns();
         }
 

@@ -43,9 +43,6 @@ function getDefaultConfig() {
   return {
     LOGIC_OPERATORS: { 与: "且", 且: "且", 或: "或", 或取反: "或取反" },
     SPECIAL_SEPARATORS: { 或延时: "或", 与延时: "且" },
-    SKIP_HEADERS: ["序号", "条件确认"],
-    SECTION_HEADERS: ["试验条件", "试验恢复", "结论", "存在问题"],
-    CONTENT_START: ["试验内容"],
     ROW_PATTERNS: {
       header: { type: "exact", values: ["序号", "条件确认"] },
       chineseTitle: { type: "regex", pattern: "^[一二三四五六七八九十]+、" },
@@ -133,7 +130,7 @@ app.post("/api/config", (req, res) => {
   }
 
   // 校验必需的配置项
-  const requiredKeys = ["LOGIC_OPERATORS", "SPECIAL_SEPARATORS", "SKIP_HEADERS", "SECTION_HEADERS"];
+  const requiredKeys = ["LOGIC_OPERATORS", "SPECIAL_SEPARATORS", "ROW_PATTERNS"];
   for (const key of requiredKeys) {
     if (!newConfig[key]) {
       return res.status(400).json({ error: `Missing required config: ${key}` });
@@ -179,9 +176,6 @@ function generateConfigFileContent(config) {
  * 配置项说明：
  *   - LOGIC_OPERATORS:      逻辑运算符映射（Excel中的值 → 输出值）
  *   - SPECIAL_SEPARATORS:   特殊分隔符映射（前缀匹配，自动转换）
- *   - SKIP_HEADERS:         需要跳过的表头行（A列精确匹配）
- *   - SECTION_HEADERS:      段落标题（这些标题下的内容不进行逻辑转换）
- *   - CONTENT_START:        内容区域起始标记
  *   - ROW_PATTERNS:         行识别规则（支持精确匹配、正则匹配、前缀匹配）
  */
 
@@ -191,7 +185,7 @@ const EXPCARD_CONFIG = {
   // 逻辑运算符映射
   // ========================================================================
   // 用途：将Excel中的逻辑运算符转换为输出格式
-  // 格式：{ "Excel中的值": "输出时使用的值" }
+  // 格式：{ 键: 值 }，键为Excel中的值，值为输出时使用的值
   //
   // 示例：
   //   Excel中写 "与"，输出时显示 "且"
@@ -205,7 +199,7 @@ const EXPCARD_CONFIG = {
   // 特殊分隔符映射
   // ========================================================================
   // 用途：处理无法正常拼接的特殊逻辑（如"或延时720s"）
-  // 格式：{ "Excel中的特殊值前缀": "转换后的输出" }
+  // 格式：{ 键: 值 }，键为特殊值前缀，值为转换后的输出
   //
   // 匹配方式：前缀匹配
   //   - "或延时720s" 匹配 "或延时"，输出 "或"
@@ -216,57 +210,15 @@ const EXPCARD_CONFIG = {
   SPECIAL_SEPARATORS: ${objectToJs(config.SPECIAL_SEPARATORS, 4)},
 
   // ========================================================================
-  // 跳过的表头
-  // ========================================================================
-  // 用途：定义需要跳过的表头行（A列精确匹配）
-  // 格式：["表头值1", "表头值2", ...]
-  //
-  // 示例：
-  //   A列 = "序号" → 跳过该行
-  //   A列 = "条件确认" → 跳过该行
-  //
-  // 注意：如果同时配置了 ROW_PATTERNS.header，优先使用 ROW_PATTERNS
-  // ========================================================================
-  SKIP_HEADERS: ${JSON.stringify(config.SKIP_HEADERS, null, 4)},
-
-  // ========================================================================
-  // 段落标题
-  // ========================================================================
-  // 用途：定义段落标题（这些标题下的内容不进行逻辑转换）
-  // 格式：["标题1", "标题2", ...]
-  //
-  // 示例：
-  //   A列 = "试验条件" → 设为跳过区间开始
-  //   A列 = "试验恢复" → 跳过该行
-  //   A列 = "结论" → 跳过该行
-  //   A列 = "存在问题" → 跳过该行
-  //
-  // 注意：如果同时配置了 ROW_PATTERNS.paragraphTitle，优先使用 ROW_PATTERNS
-  // ========================================================================
-  SECTION_HEADERS: ${JSON.stringify(config.SECTION_HEADERS, null, 4)},
-
-  // ========================================================================
-  // 内容区域起始标记
-  // ========================================================================
-  // 用途：定义内容区域的起始标记
-  // 格式：["标记1", "标记2", ...]
-  //
-  // 说明：当A列匹配此标记时，开始处理后续内容行
-  //
-  // 注意：如果同时配置了 ROW_PATTERNS.contentStart，优先使用 ROW_PATTERNS
-  // ========================================================================
-  CONTENT_START: ${JSON.stringify(config.CONTENT_START, null, 4)},
-
-  // ========================================================================
   // 行识别规则
   // ========================================================================
   // 用途：定义各类行的识别条件
-  // 格式：{ "规则名称": { type: "匹配类型", ... } }
+  // 格式：{ 规则名称: { type: 匹配类型, ... } }
   //
   // 支持的匹配类型：
-  //   - "exact":     精确匹配，值在 values 数组中
-  //   - "regex":     正则匹配，pattern 为正则表达式字符串
-  //   - "startsWith": 前缀匹配，值在 values 数组中
+  //   - exact:       精确匹配，值在 values 数组中
+  //   - regex:       正则匹配，pattern 为正则表达式字符串
+  //   - startsWith:  前缀匹配，值在 values 数组中
   //
   // 规则名称说明：
   //   - header:           表头行（匹配后跳过该行）
@@ -280,8 +232,7 @@ const EXPCARD_CONFIG = {
   //
   // 注意：
   //   1. 正则表达式中的反斜杠需要转义（如 \\d 而非 \d）
-  //   2. 如果不配置 ROW_PATTERNS，会使用默认规则
-  //   3. 配置 ROW_PATTERNS 后，SKIP_HEADERS 和 SECTION_HEADERS 仍可作为备份
+  //   2. 不配置的规则会使用内置默认值
   // ========================================================================
   ROW_PATTERNS: ${JSON.stringify(config.ROW_PATTERNS || getDefaultConfig().ROW_PATTERNS, null, 4)}
 };

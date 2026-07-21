@@ -14,9 +14,6 @@ class ExpCardConverter {
     this.LOGIC_OPERATORS = config.LOGIC_OPERATORS;
     this.SPECIAL_SEPARATORS = config.SPECIAL_SEPARATORS;
     this.LOGIC_SEPARATORS = Object.keys(this.LOGIC_OPERATORS);
-    this.SKIP_HEADERS = config.SKIP_HEADERS;
-    this.SECTION_HEADERS = config.SECTION_HEADERS;
-    this.CONTENT_START = config.CONTENT_START || ['试验内容'];
 
     // 解析行识别规则
     this.ROW_PATTERNS = this._parseRowPatterns(config.ROW_PATTERNS);
@@ -35,9 +32,6 @@ class ExpCardConverter {
     return {
       LOGIC_OPERATORS: { '与': '且', '且': '且', '或': '或', '或取反': '或取反' },
       SPECIAL_SEPARATORS: { '或延时': '或', '与延时': '且' },
-      SKIP_HEADERS: ['序号', '条件确认'],
-      SECTION_HEADERS: ['试验条件', '试验恢复', '结论', '存在问题'],
-      CONTENT_START: ['试验内容'],
       ROW_PATTERNS: {
         header: { type: 'exact', values: ['序号', '条件确认'] },
         chineseTitle: { type: 'regex', pattern: '^[一二三四五六七八九十]+、' },
@@ -66,7 +60,7 @@ class ExpCardConverter {
 
   _matchPattern(text, patternKey) {
     if (!this.ROW_PATTERNS || !this.ROW_PATTERNS[patternKey]) {
-      return this._matchDefaultPattern(text, patternKey);
+      return false;
     }
     const pattern = this.ROW_PATTERNS[patternKey];
     if (pattern.type === 'regex') {
@@ -77,29 +71,6 @@ class ExpCardConverter {
       return pattern.values.some(v => text.startsWith(v));
     }
     return false;
-  }
-
-  _matchDefaultPattern(text, patternKey) {
-    switch (patternKey) {
-      case 'header':
-        return this.SKIP_HEADERS.includes(text);
-      case 'chineseTitle':
-        return /^[一二三四五六七八九十]+、/.test(text);
-      case 'subTitle':
-        return /^\d+\.[\u4e00-\u9fa5]/.test(text);
-      case 'pureNumber':
-        return /^\d+$/.test(text) && !text.includes('.');
-      case 'subItem':
-        return /^\d+\.\d+$/.test(text);
-      case 'paragraphTitle':
-        return this.SECTION_HEADERS.includes(text);
-      case 'contentStart':
-        return this.CONTENT_START.includes(text);
-      case 'skipSectionStart':
-        return this.SECTION_HEADERS.includes(text) && text === '试验条件';
-      default:
-        return false;
-    }
   }
 
   convert(rows) {
