@@ -1801,6 +1801,284 @@
             display: none;
         }
 
+        /* 设置按钮 */
+        .settings-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .settings-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+            transform: scale(1.02);
+        }
+
+        .settings-toggle:active {
+            transform: scale(0.98);
+        }
+
+        .settings-toggle svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* 配置面板 */
+        .config-modal {
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .config-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .config-modal-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .config-modal-close {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .config-modal-close:hover {
+            background: var(--border);
+            color: var(--text-primary);
+        }
+
+        .config-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .config-modal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+            gap: 12px;
+        }
+
+        .config-section {
+            margin-bottom: 24px;
+        }
+
+        .config-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .config-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .config-section-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .config-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .config-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .config-item-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            min-width: 100px;
+            flex-shrink: 0;
+        }
+
+        .config-item-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            transition: border-color 0.2s ease;
+        }
+
+        .config-item-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .config-item-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .config-tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .config-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 12px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        .config-tag-remove {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border: none;
+            border-radius: 50%;
+            background: transparent;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            transition: background 0.2s ease;
+        }
+
+        .config-tag-remove:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .config-tag-input {
+            flex: 1;
+            min-width: 100px;
+            padding: 4px 8px;
+            border: 1px dashed var(--border);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 12px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+        }
+
+        .config-tag-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            border-style: solid;
+        }
+
+        .config-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .config-row .config-item {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .config-btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .config-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .config-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .config-btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .config-btn-primary:hover {
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+            color: white;
+        }
+
+        .config-btn-danger {
+            color: #ef4444;
+        }
+
+        .config-btn-danger:hover {
+            background: #fef2f2;
+            border-color: #ef4444;
+        }
+
+        .config-item-help {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
         /* 设置弹窗 */
         .modal-overlay {
             position: fixed;
@@ -2461,6 +2739,12 @@
                     <span class="theme-icon-dark">🌙</span>
                     <span class="theme-icon-neumorphism">🌈</span>
                 </button>
+                <button class="settings-toggle" id="settingsToggle" title="配置规则">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </button>
             </div>
 
             <div class="output-panel">
@@ -2492,6 +2776,74 @@
             </div>
         </div>
     </div>
+
+    <!-- 配置面板 -->
+    <div class="modal-overlay" id="configModal" style="display:none;">
+        <div class="config-modal">
+            <div class="config-modal-header">
+                <h3>配置规则</h3>
+                <button class="config-modal-close" id="configModalClose">×</button>
+            </div>
+            <div class="config-modal-body">
+                <!-- 逻辑运算符 -->
+                <div class="config-section">
+                    <div class="config-section-title">逻辑运算符映射</div>
+                    <div class="config-section-desc">将Excel中的逻辑运算符转换为输出格式，格式：键为Excel值，值为输出值</div>
+                    <div id="logicOperatorsList"></div>
+                    <button class="config-btn" id="addLogicOperator" style="margin-top:8px;">+ 添加</button>
+                </div>
+
+                <!-- 特殊分隔符 -->
+                <div class="config-section">
+                    <div class="config-section-title">特殊分隔符映射</div>
+                    <div class="config-section-desc">处理无法正常拼接的特殊逻辑，采用前缀匹配（如"或延时720s"匹配"或延时"）</div>
+                    <div id="specialSeparatorsList"></div>
+                    <button class="config-btn" id="addSpecialSeparator" style="margin-top:8px;">+ 添加</button>
+                </div>
+
+                <!-- 跳过的表头 -->
+                <div class="config-section">
+                    <div class="config-section-title">跳过的表头</div>
+                    <div class="config-section-desc">A列精确匹配这些值时，跳过该行</div>
+                    <div class="config-tag-list" id="skipHeadersList"></div>
+                </div>
+
+                <!-- 段落标题 -->
+                <div class="config-section">
+                    <div class="config-section-title">段落标题</div>
+                    <div class="config-section-desc">这些标题下的内容不进行逻辑转换</div>
+                    <div class="config-tag-list" id="sectionHeadersList"></div>
+                </div>
+
+                <!-- 内容起始标记 -->
+                <div class="config-section">
+                    <div class="config-section-title">内容区域起始标记</div>
+                    <div class="config-section-desc">A列匹配此标记时，开始处理后续内容行</div>
+                    <div class="config-tag-list" id="contentStartList"></div>
+                </div>
+
+                <!-- 行识别规则 -->
+                <div class="config-section">
+                    <div class="config-section-title">行识别规则</div>
+                    <div class="config-section-desc">定义各类行的识别条件（支持 exact/regex/startsWith 三种类型）</div>
+                    <div id="rowPatternsList"></div>
+                </div>
+            </div>
+            <div class="config-modal-footer">
+                <div class="config-btn-group">
+                    <button class="config-btn" id="configImportBtn">导入配置</button>
+                    <button class="config-btn" id="configExportBtn">导出配置</button>
+                    <button class="config-btn config-btn-danger" id="configResetBtn">恢复默认</button>
+                </div>
+                <div class="config-btn-group">
+                    <button class="config-btn" id="configCancelBtn">取消</button>
+                    <button class="config-btn config-btn-primary" id="configSaveBtn">保存配置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="configImportInput" accept=".json" style="display:none;">
 
     <script>
         const themeBtn = document.getElementById('themeToggle');
@@ -3059,6 +3411,398 @@
         }
 
         downloadWordBtn.addEventListener('click', downloadWord);
+
+        // ====================================================================
+        // 配置面板
+        // ====================================================================
+        const settingsToggle = document.getElementById('settingsToggle');
+        const configModal = document.getElementById('configModal');
+        const configModalClose = document.getElementById('configModalClose');
+        const configSaveBtn = document.getElementById('configSaveBtn');
+        const configCancelBtn = document.getElementById('configCancelBtn');
+        const configResetBtn = document.getElementById('configResetBtn');
+        const configImportBtn = document.getElementById('configImportBtn');
+        const configExportBtn = document.getElementById('configExportBtn');
+        const configImportInput = document.getElementById('configImportInput');
+
+        let currentConfig = null;
+
+        // 默认配置
+        const DEFAULT_CONFIG = {
+            LOGIC_OPERATORS: { '与': '且', '且': '且', '或': '或', '或取反': '或取反' },
+            SPECIAL_SEPARATORS: { '或延时': '或', '与延时': '且' },
+            SKIP_HEADERS: ['序号', '条件确认'],
+            SECTION_HEADERS: ['试验条件', '试验恢复', '结论', '存在问题'],
+            CONTENT_START: ['试验内容'],
+            ROW_PATTERNS: {
+                header: { type: 'exact', values: ['序号', '条件确认'] },
+                chineseTitle: { type: 'regex', pattern: '^[一二三四五六七八九十]+、' },
+                subTitle: { type: 'regex', pattern: '^\\d+\\.[\\u4e00-\\u9fa5]' },
+                pureNumber: { type: 'regex', pattern: '^\\d+$' },
+                subItem: { type: 'regex', pattern: '^\\d+\\.\\d+$' },
+                paragraphTitle: { type: 'exact', values: ['试验条件', '试验恢复', '结论', '存在问题'] },
+                contentStart: { type: 'exact', values: ['试验内容'] },
+                skipSectionStart: { type: 'exact', values: ['试验条件'] }
+            }
+        };
+
+        // 打开配置面板
+        settingsToggle.addEventListener('click', async () => {
+            await loadConfig();
+            renderConfigPanel();
+            configModal.style.display = 'flex';
+        });
+
+        // 关闭配置面板
+        configModalClose.addEventListener('click', () => {
+            configModal.style.display = 'none';
+        });
+
+        configCancelBtn.addEventListener('click', () => {
+            configModal.style.display = 'none';
+        });
+
+        // 点击遮罩关闭
+        configModal.addEventListener('click', (e) => {
+            if (e.target === configModal) {
+                configModal.style.display = 'none';
+            }
+        });
+
+        // 加载配置
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/config');
+                if (response.ok) {
+                    currentConfig = await response.json();
+                } else {
+                    currentConfig = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+                }
+            } catch (e) {
+                currentConfig = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+            }
+        }
+
+        // 渲染配置面板
+        function renderConfigPanel() {
+            renderLogicOperators();
+            renderSpecialSeparators();
+            renderTagList('skipHeadersList', currentConfig.SKIP_HEADERS, 'skipHeaders');
+            renderTagList('sectionHeadersList', currentConfig.SECTION_HEADERS, 'sectionHeaders');
+            renderTagList('contentStartList', currentConfig.CONTENT_START, 'contentStart');
+            renderRowPatterns();
+        }
+
+        // 渲染逻辑运算符
+        function renderLogicOperators() {
+            const container = document.getElementById('logicOperatorsList');
+            container.innerHTML = '';
+            for (const [key, value] of Object.entries(currentConfig.LOGIC_OPERATORS)) {
+                const item = document.createElement('div');
+                item.className = 'config-item';
+                item.innerHTML = `
+                    <input type="text" class="config-item-input" value="${key}" placeholder="Excel值" data-field="key" style="max-width:120px;">
+                    <span style="color:var(--text-muted);">→</span>
+                    <input type="text" class="config-item-input" value="${value}" placeholder="输出值" data-field="value" style="max-width:120px;">
+                    <button class="config-tag-remove" title="删除">×</button>
+                `;
+                const keyInput = item.querySelector('[data-field="key"]');
+                const valueInput = item.querySelector('[data-field="value"]');
+                const removeBtn = item.querySelector('.config-tag-remove');
+
+                keyInput.addEventListener('change', (e) => {
+                    const oldKey = key;
+                    const newKey = e.target.value.trim();
+                    if (newKey && newKey !== oldKey) {
+                        delete currentConfig.LOGIC_OPERATORS[oldKey];
+                        currentConfig.LOGIC_OPERATORS[newKey] = value;
+                    }
+                });
+
+                valueInput.addEventListener('change', (e) => {
+                    currentConfig.LOGIC_OPERATORS[key] = e.target.value.trim() || value;
+                });
+
+                removeBtn.addEventListener('click', () => {
+                    delete currentConfig.LOGIC_OPERATORS[key];
+                    renderLogicOperators();
+                });
+
+                container.appendChild(item);
+            }
+        }
+
+        document.getElementById('addLogicOperator').addEventListener('click', () => {
+            let newKey = '新运算符';
+            let i = 1;
+            while (currentConfig.LOGIC_OPERATORS[newKey]) {
+                newKey = '新运算符' + (++i);
+            }
+            currentConfig.LOGIC_OPERATORS[newKey] = '';
+            renderLogicOperators();
+        });
+
+        // 渲染特殊分隔符
+        function renderSpecialSeparators() {
+            const container = document.getElementById('specialSeparatorsList');
+            container.innerHTML = '';
+            for (const [key, value] of Object.entries(currentConfig.SPECIAL_SEPARATORS)) {
+                const item = document.createElement('div');
+                item.className = 'config-item';
+                item.innerHTML = `
+                    <input type="text" class="config-item-input" value="${key}" placeholder="前缀" data-field="key" style="max-width:120px;">
+                    <span style="color:var(--text-muted);">→</span>
+                    <input type="text" class="config-item-input" value="${value}" placeholder="输出值" data-field="value" style="max-width:120px;">
+                    <button class="config-tag-remove" title="删除">×</button>
+                `;
+                const keyInput = item.querySelector('[data-field="key"]');
+                const valueInput = item.querySelector('[data-field="value"]');
+                const removeBtn = item.querySelector('.config-tag-remove');
+
+                keyInput.addEventListener('change', (e) => {
+                    const oldKey = key;
+                    const newKey = e.target.value.trim();
+                    if (newKey && newKey !== oldKey) {
+                        delete currentConfig.SPECIAL_SEPARATORS[oldKey];
+                        currentConfig.SPECIAL_SEPARATORS[newKey] = value;
+                    }
+                });
+
+                valueInput.addEventListener('change', (e) => {
+                    currentConfig.SPECIAL_SEPARATORS[key] = e.target.value.trim() || value;
+                });
+
+                removeBtn.addEventListener('click', () => {
+                    delete currentConfig.SPECIAL_SEPARATORS[key];
+                    renderSpecialSeparators();
+                });
+
+                container.appendChild(item);
+            }
+        }
+
+        document.getElementById('addSpecialSeparator').addEventListener('click', () => {
+            let newKey = '新分隔符';
+            let i = 1;
+            while (currentConfig.SPECIAL_SEPARATORS[newKey]) {
+                newKey = '新分隔符' + (++i);
+            }
+            currentConfig.SPECIAL_SEPARATORS[newKey] = '';
+            renderSpecialSeparators();
+        });
+
+        // 渲染标签列表
+        function renderTagList(containerId, items, configKey) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            items.forEach((item, index) => {
+                const tag = document.createElement('span');
+                tag.className = 'config-tag';
+                tag.innerHTML = `
+                    ${item}
+                    <button class="config-tag-remove" title="删除">×</button>
+                `;
+                tag.querySelector('.config-tag-remove').addEventListener('click', () => {
+                    items.splice(index, 1);
+                    renderTagList(containerId, items, configKey);
+                });
+                container.appendChild(tag);
+            });
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'config-tag-input';
+            input.placeholder = '输入后按回车添加';
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const val = input.value.trim();
+                    if (val && !items.includes(val)) {
+                        items.push(val);
+                        renderTagList(containerId, items, configKey);
+                    }
+                    input.value = '';
+                }
+            });
+            container.appendChild(input);
+        }
+
+        // 行识别规则中文名称映射
+        const ROW_PATTERN_NAMES = {
+            header: '表头行',
+            chineseTitle: '中文数字标题',
+            subTitle: '子标题',
+            pureNumber: '纯数字行',
+            subItem: '子项行',
+            paragraphTitle: '段落标题',
+            contentStart: '内容起始标记',
+            skipSectionStart: '跳过区间开始'
+        };
+
+        // 匹配类型中文名称映射
+        const TYPE_NAMES = {
+            exact: '精确匹配',
+            regex: '正则匹配',
+            startsWith: '前缀匹配'
+        };
+
+        // 渲染行识别规则
+        function renderRowPatterns() {
+            const container = document.getElementById('rowPatternsList');
+            container.innerHTML = '';
+            for (const [key, pattern] of Object.entries(currentConfig.ROW_PATTERNS || {})) {
+                const item = document.createElement('div');
+                item.className = 'config-item';
+                item.style.flexDirection = 'column';
+                item.style.alignItems = 'stretch';
+
+                const typeOptions = ['exact', 'regex', 'startsWith'].map(t =>
+                    `<option value="${t}" ${pattern.type === t ? 'selected' : ''}>${TYPE_NAMES[t] || t}</option>`
+                ).join('');
+
+                let valueHtml = '';
+                if (pattern.type === 'exact' || pattern.type === 'startsWith') {
+                    valueHtml = `
+                        <div class="config-tag-list" data-pattern="${key}" data-type="${pattern.type}">
+                            ${(pattern.values || []).map(v => `
+                                <span class="config-tag">
+                                    ${v}
+                                    <button class="config-tag-remove" title="删除">×</button>
+                                </span>
+                            `).join('')}
+                            <input type="text" class="config-tag-input" placeholder="输入后按回车添加">
+                        </div>
+                    `;
+                } else {
+                    valueHtml = `
+                        <input type="text" class="config-item-input" value="${pattern.pattern || ''}" placeholder="正则表达式" data-pattern="${key}" data-field="pattern">
+                    `;
+                }
+
+                item.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:12px;width:100%;">
+                        <span class="config-item-label" style="min-width:140px;">${ROW_PATTERN_NAMES[key] || key}</span>
+                        <select class="config-item-input" data-pattern="${key}" data-field="type" style="max-width:120px;">
+                            ${typeOptions}
+                        </select>
+                        <div style="flex:1;">${valueHtml}</div>
+                    </div>
+                    <div class="config-item-help">${pattern.description || ''}</div>
+                `;
+
+                const typeSelect = item.querySelector('[data-field="type"]');
+                typeSelect.addEventListener('change', (e) => {
+                    const newType = e.target.value;
+                    if (newType === 'regex') {
+                        currentConfig.ROW_PATTERNS[key] = { type: 'regex', pattern: '', description: pattern.description };
+                    } else {
+                        currentConfig.ROW_PATTERNS[key] = { type: newType, values: [], description: pattern.description };
+                    }
+                    renderRowPatterns();
+                });
+
+                if (pattern.type === 'regex') {
+                    const patternInput = item.querySelector('[data-field="pattern"]');
+                    if (patternInput) {
+                        patternInput.addEventListener('change', (e) => {
+                            currentConfig.ROW_PATTERNS[key].pattern = e.target.value;
+                        });
+                    }
+                } else {
+                    const tagList = item.querySelector('.config-tag-list');
+                    if (tagList) {
+                        const tagInput = tagList.querySelector('.config-tag-input');
+                        tagInput.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter') {
+                                const val = tagInput.value.trim();
+                                if (val && !pattern.values.includes(val)) {
+                                    pattern.values.push(val);
+                                    renderRowPatterns();
+                                }
+                                tagInput.value = '';
+                            }
+                        });
+
+                        tagList.querySelectorAll('.config-tag-remove').forEach((btn, idx) => {
+                            btn.addEventListener('click', () => {
+                                pattern.values.splice(idx, 1);
+                                renderRowPatterns();
+                            });
+                        });
+                    }
+                }
+
+                container.appendChild(item);
+            }
+        }
+
+        // 保存配置
+        configSaveBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(currentConfig)
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || '保存失败');
+                }
+
+                // 更新本地 EXPCARD_CONFIG
+                if (typeof EXPCARD_CONFIG !== 'undefined') {
+                    Object.assign(EXPCARD_CONFIG, currentConfig);
+                }
+
+                configModal.style.display = 'none';
+                alert('配置已保存');
+            } catch (err) {
+                alert('保存失败: ' + err.message);
+            }
+        });
+
+        // 恢复默认配置
+        configResetBtn.addEventListener('click', () => {
+            if (confirm('确定要恢复默认配置吗？')) {
+                currentConfig = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+                renderConfigPanel();
+            }
+        });
+
+        // 导出配置
+        configExportBtn.addEventListener('click', () => {
+            const blob = new Blob([JSON.stringify(currentConfig, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'expcard-config.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // 导入配置
+        configImportBtn.addEventListener('click', () => {
+            configImportInput.click();
+        });
+
+        configImportInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const imported = JSON.parse(ev.target.result);
+                    currentConfig = imported;
+                    renderConfigPanel();
+                    alert('配置已导入，请点击保存');
+                } catch (err) {
+                    alert('导入失败: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+            configImportInput.value = '';
+        });
     </script>
 </body>
 </html>

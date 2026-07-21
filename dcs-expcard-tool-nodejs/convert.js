@@ -6,12 +6,7 @@ class ExpCardConverter {
   constructor(config = null) {
     // 如果没有传入配置，尝试从全局变量获取，否则使用默认配置
     if (config === null) {
-      config = (typeof EXPCARD_CONFIG !== 'undefined') ? EXPCARD_CONFIG : {
-        LOGIC_OPERATORS: { '与': '且', '且': '且', '或': '或', '或取反': '或取反' },
-        SPECIAL_SEPARATORS: { '或延时': '或', '与延时': '且' },
-        SKIP_HEADERS: ['序号', '条件确认'],
-        SECTION_HEADERS: ['试验条件', '试验恢复', '结论', '存在问题']
-      };
+      config = (typeof EXPCARD_CONFIG !== 'undefined') ? EXPCARD_CONFIG : this._getDefaultConfig();
     }
     this.config = config;
 
@@ -21,6 +16,10 @@ class ExpCardConverter {
     this.LOGIC_SEPARATORS = Object.keys(this.LOGIC_OPERATORS);
     this.SKIP_HEADERS = config.SKIP_HEADERS;
     this.SECTION_HEADERS = config.SECTION_HEADERS;
+    this.CONTENT_START = config.CONTENT_START || ['试验内容'];
+
+    // 解析行识别规则
+    this.ROW_PATTERNS = this._parseRowPatterns(config.ROW_PATTERNS);
 
     this.output = [];
     this.inContentArea = false;
@@ -30,6 +29,77 @@ class ExpCardConverter {
     this.special_separator_positions = new Set();
     this._recordedPositions = new Set();
     this.itemCounter = 0;
+  }
+
+  _getDefaultConfig() {
+    return {
+      LOGIC_OPERATORS: { '与': '且', '且': '且', '或': '或', '或取反': '或取反' },
+      SPECIAL_SEPARATORS: { '或延时': '或', '与延时': '且' },
+      SKIP_HEADERS: ['序号', '条件确认'],
+      SECTION_HEADERS: ['试验条件', '试验恢复', '结论', '存在问题'],
+      CONTENT_START: ['试验内容'],
+      ROW_PATTERNS: {
+        header: { type: 'exact', values: ['序号', '条件确认'] },
+        chineseTitle: { type: 'regex', pattern: '^[一二三四五六七八九十]+、' },
+        subTitle: { type: 'regex', pattern: '^\\d+\\.[\\u4e00-\\u9fa5]' },
+        pureNumber: { type: 'regex', pattern: '^\\d+$' },
+        subItem: { type: 'regex', pattern: '^\\d+\\.\\d+$' },
+        paragraphTitle: { type: 'exact', values: ['试验条件', '试验恢复', '结论', '存在问题'] },
+        contentStart: { type: 'exact', values: ['试验内容'] },
+        skipSectionStart: { type: 'exact', values: ['试验条件'] }
+      }
+    };
+  }
+
+  _parseRowPatterns(patterns) {
+    if (!patterns) return null;
+    const result = {};
+    for (const [key, pattern] of Object.entries(patterns)) {
+      if (pattern.type === 'regex') {
+        result[key] = { type: 'regex', regex: new RegExp(pattern.pattern) };
+      } else {
+        result[key] = pattern;
+      }
+    }
+    return result;
+  }
+
+  _matchPattern(text, patternKey) {
+    if (!this.ROW_PATTERNS || !this.ROW_PATTERNS[patternKey]) {
+      return this._matchDefaultPattern(text, patternKey);
+    }
+    const pattern = this.ROW_PATTERNS[patternKey];
+    if (pattern.type === 'regex') {
+      return pattern.regex.test(text);
+    } else if (pattern.type === 'exact') {
+      return pattern.values.includes(text);
+    } else if (pattern.type === 'startsWith') {
+      return pattern.values.some(v => text.startsWith(v));
+    }
+    return false;
+  }
+
+  _matchDefaultPattern(text, patternKey) {
+    switch (patternKey) {
+      case 'header':
+        return this.SKIP_HEADERS.includes(text);
+      case 'chineseTitle':
+        return /^[一二三四五六七八九十]+、/.test(text);
+      case 'subTitle':
+        return /^\d+\.[\u4e00-\u9fa5]/.test(text);
+      case 'pureNumber':
+        return /^\d+$/.test(text) && !text.includes('.');
+      case 'subItem':
+        return /^\d+\.\d+$/.test(text);
+      case 'paragraphTitle':
+        return this.SECTION_HEADERS.includes(text);
+      case 'contentStart':
+        return this.CONTENT_START.includes(text);
+      case 'skipSectionStart':
+        return this.SECTION_HEADERS.includes(text) && text === '试验条件';
+      default:
+        return false;
+    }
   }
 
   convert(rows) {
@@ -87,15 +157,15 @@ class ExpCardConverter {
       return;
     }
 
-    if (this.SECTION_HEADERS.includes(seqNum)) {
-      if (seqNum === "试验条件") {
+    if (this._matchPattern(seqNum, 'paragraphTitle')) {
+      if (this._matchPattern(seqNum, 'skipSectionStart')) {
         this.skipSection = true;
       }
       this.inContentArea = false;
       return;
     }
 
-    if (seqNum === "试验内容") {
+    if (this._isContentStart(seqNum)) {
       this.inContentArea = true;
       this.skipSection = false;
       return;
@@ -112,7 +182,7 @@ class ExpCardConverter {
       return;
     }
 
-    if (/^\d+$/.test(seqNum) && !seqNum.includes(".")) {
+    if (this._isPureNumber(seqNum)) {
       this._processLevel1(seqNum, logicCol, contentCol, row, allRows, index);
       return;
     }
@@ -126,21 +196,29 @@ class ExpCardConverter {
   _isHeaderRow(row) {
     const seqNum = row[0] || "";
     const logicCol = row[1] || "";
-    if (this.SKIP_HEADERS.includes(seqNum)) return true;
+    if (this._matchPattern(seqNum, 'header')) return true;
     if (seqNum === "序号" && (logicCol.includes("条件") || logicCol.includes("内容"))) return true;
     return false;
   }
 
   _isChineseNumberTitle(text) {
-    return /^[一二三四五六七八九十]+、/.test(text);
+    return this._matchPattern(text, 'chineseTitle');
   }
 
   _isSubTitle(text) {
-    return /^\d+\.[\u4e00-\u9fa5]/.test(text);
+    return this._matchPattern(text, 'subTitle');
+  }
+
+  _isPureNumber(text) {
+    return this._matchPattern(text, 'pureNumber');
   }
 
   _isSubItem(text) {
-    return /^\d+\.\d+$/.test(text);
+    return this._matchPattern(text, 'subItem');
+  }
+
+  _isContentStart(text) {
+    return this._matchPattern(text, 'contentStart');
   }
 
   _extractTitleLogic(title) {
@@ -502,15 +580,15 @@ class ExpCardConverter {
       return;
     }
 
-    if (this.SECTION_HEADERS.includes(seqNum)) {
-      if (seqNum === "试验条件") {
+    if (this._matchPattern(seqNum, 'paragraphTitle')) {
+      if (this._matchPattern(seqNum, 'skipSectionStart')) {
         this.skipSection = true;
       }
       this.inContentArea = false;
       return;
     }
 
-    if (seqNum === "试验内容") {
+    if (this._isContentStart(seqNum)) {
       this.inContentArea = true;
       this.skipSection = false;
       return;
@@ -528,7 +606,7 @@ class ExpCardConverter {
       return;
     }
 
-    if (/^\d+$/.test(seqNum)) {
+    if (this._isPureNumber(seqNum)) {
       this._processNewItem(seqNum, row, allRows, index);
       return;
     }
