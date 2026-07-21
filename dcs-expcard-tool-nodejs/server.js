@@ -158,6 +158,16 @@ app.post("/api/config", (req, res) => {
   }
 });
 
+// 将对象转换为不带引号键的JS格式
+function objectToJs(obj, indent = 4) {
+  const spaces = " ".repeat(indent);
+  const entries = Object.entries(obj).map(([key, value]) => {
+    const val = typeof value === "string" ? `"${value}"` : JSON.stringify(value);
+    return `${spaces}${key}: ${val}`;
+  });
+  return `{\n${entries.join(",\n")},\n${" ".repeat(indent - 2)}}`;
+}
+
 // 生成配置文件内容
 function generateConfigFileContent(config) {
   return `/**
@@ -189,7 +199,7 @@ const EXPCARD_CONFIG = {
   //
   // 注意：此处定义的键会自动成为逻辑分隔符识别列表
   // ========================================================================
-  LOGIC_OPERATORS: ${JSON.stringify(config.LOGIC_OPERATORS, null, 4)},
+  LOGIC_OPERATORS: ${objectToJs(config.LOGIC_OPERATORS, 4)},
 
   // ========================================================================
   // 特殊分隔符映射
@@ -203,7 +213,7 @@ const EXPCARD_CONFIG = {
   //
   // 特殊分隔符的位置会被记录，用于后续标记警告
   // ========================================================================
-  SPECIAL_SEPARATORS: ${JSON.stringify(config.SPECIAL_SEPARATORS, null, 4)},
+  SPECIAL_SEPARATORS: ${objectToJs(config.SPECIAL_SEPARATORS, 4)},
 
   // ========================================================================
   // 跳过的表头
