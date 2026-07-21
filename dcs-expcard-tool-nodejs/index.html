@@ -3493,6 +3493,22 @@
             renderRowPatterns();
         }
 
+        // 同步逻辑运算符到 currentConfig
+        function syncLogicOperators() {
+            const container = document.getElementById('logicOperatorsList');
+            const newOperators = {};
+            container.querySelectorAll('.config-item').forEach(item => {
+                const keyInput = item.querySelector('[data-field="key"]');
+                const valueInput = item.querySelector('[data-field="value"]');
+                const key = keyInput.value.trim();
+                const value = valueInput.value.trim();
+                if (key) {
+                    newOperators[key] = value;
+                }
+            });
+            currentConfig.LOGIC_OPERATORS = newOperators;
+        }
+
         // 渲染逻辑运算符
         function renderLogicOperators() {
             const container = document.getElementById('logicOperatorsList');
@@ -3510,21 +3526,12 @@
                 const valueInput = item.querySelector('[data-field="value"]');
                 const removeBtn = item.querySelector('.config-tag-remove');
 
-                keyInput.addEventListener('change', (e) => {
-                    const oldKey = key;
-                    const newKey = e.target.value.trim();
-                    if (newKey && newKey !== oldKey) {
-                        delete currentConfig.LOGIC_OPERATORS[oldKey];
-                        currentConfig.LOGIC_OPERATORS[newKey] = value;
-                    }
-                });
-
-                valueInput.addEventListener('change', (e) => {
-                    currentConfig.LOGIC_OPERATORS[key] = e.target.value.trim() || value;
-                });
+                keyInput.addEventListener('change', syncLogicOperators);
+                valueInput.addEventListener('change', syncLogicOperators);
 
                 removeBtn.addEventListener('click', () => {
-                    delete currentConfig.LOGIC_OPERATORS[key];
+                    syncLogicOperators();
+                    delete currentConfig.LOGIC_OPERATORS[keyInput.value.trim()];
                     renderLogicOperators();
                 });
 
@@ -3533,6 +3540,7 @@
         }
 
         document.getElementById('addLogicOperator').addEventListener('click', () => {
+            syncLogicOperators();
             let newKey = '新运算符';
             let i = 1;
             while (currentConfig.LOGIC_OPERATORS[newKey]) {
@@ -3541,6 +3549,22 @@
             currentConfig.LOGIC_OPERATORS[newKey] = '';
             renderLogicOperators();
         });
+
+        // 同步特殊分隔符到 currentConfig
+        function syncSpecialSeparators() {
+            const container = document.getElementById('specialSeparatorsList');
+            const newSeparators = {};
+            container.querySelectorAll('.config-item').forEach(item => {
+                const keyInput = item.querySelector('[data-field="key"]');
+                const valueInput = item.querySelector('[data-field="value"]');
+                const key = keyInput.value.trim();
+                const value = valueInput.value.trim();
+                if (key) {
+                    newSeparators[key] = value;
+                }
+            });
+            currentConfig.SPECIAL_SEPARATORS = newSeparators;
+        }
 
         // 渲染特殊分隔符
         function renderSpecialSeparators() {
@@ -3559,21 +3583,12 @@
                 const valueInput = item.querySelector('[data-field="value"]');
                 const removeBtn = item.querySelector('.config-tag-remove');
 
-                keyInput.addEventListener('change', (e) => {
-                    const oldKey = key;
-                    const newKey = e.target.value.trim();
-                    if (newKey && newKey !== oldKey) {
-                        delete currentConfig.SPECIAL_SEPARATORS[oldKey];
-                        currentConfig.SPECIAL_SEPARATORS[newKey] = value;
-                    }
-                });
-
-                valueInput.addEventListener('change', (e) => {
-                    currentConfig.SPECIAL_SEPARATORS[key] = e.target.value.trim() || value;
-                });
+                keyInput.addEventListener('change', syncSpecialSeparators);
+                valueInput.addEventListener('change', syncSpecialSeparators);
 
                 removeBtn.addEventListener('click', () => {
-                    delete currentConfig.SPECIAL_SEPARATORS[key];
+                    syncSpecialSeparators();
+                    delete currentConfig.SPECIAL_SEPARATORS[keyInput.value.trim()];
                     renderSpecialSeparators();
                 });
 
@@ -3582,6 +3597,7 @@
         }
 
         document.getElementById('addSpecialSeparator').addEventListener('click', () => {
+            syncSpecialSeparators();
             let newKey = '新分隔符';
             let i = 1;
             while (currentConfig.SPECIAL_SEPARATORS[newKey]) {
@@ -3738,6 +3754,10 @@
         // 保存配置
         configSaveBtn.addEventListener('click', async () => {
             try {
+                // 保存前同步数据
+                syncLogicOperators();
+                syncSpecialSeparators();
+
                 const response = await fetch('/api/config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
