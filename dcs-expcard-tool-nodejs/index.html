@@ -1994,6 +1994,81 @@
             letter-spacing: 0.5px;
         }
 
+        /* 层级编辑项 */
+        .level-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .level-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .level-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .level-item-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .level-item-select {
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .level-item-body {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .level-item-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .level-item-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .level-item-input {
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--surface);
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        .level-item-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .level-item-hint {
+            margin-top: 8px;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
         /* 风格模板列表 */
         .template-list {
             display: grid;
@@ -3103,7 +3178,7 @@
                                 <div class="template-item" data-template="chinese">
                                     <div class="template-name">中文风格</div>
                                     <div class="template-desc">中文数字编号</div>
-                                    <div class="template-preview">一、试验内容<br>   1. 条件A<br>      (1) 子条件</div>
+                                    <div class="template-preview">一、试验内容<br>   一.1 条件A<br>      (一.1) 子条件</div>
                                 </div>
                                 <div class="template-item" data-template="roman">
                                     <div class="template-name">罗马风格</div>
@@ -3117,12 +3192,13 @@
                         <div class="format-preview-box">
                             <div class="format-preview-title">实时预览</div>
                             <div class="format-preview-content" id="formatPreview">
-                                <div class="preview-line">1. 试验内容</div>
-                                <div class="preview-line preview-indent-1">1.1 条件A（且）</div>
+                                <div class="preview-line preview-title">一、试验内容</div>
+                                <div class="preview-line preview-subtitle preview-indent-1">1.1 试验条件（且）</div>
+                                <div class="preview-line preview-indent-1">1.1.1 条件A</div>
                                 <div class="preview-line preview-indent-2">- 子条件1 或 子条件2</div>
-                                <div class="preview-line preview-indent-1">1.2 条件B</div>
-                                <div class="preview-line">2. 试验恢复</div>
-                                <div class="preview-line preview-indent-1">2.1 条件C</div>
+                                <div class="preview-line preview-subtitle preview-indent-1">1.2 试验恢复</div>
+                                <div class="preview-line preview-title">二、结论</div>
+                                <div class="preview-line preview-subtitle preview-indent-1">2.1 结论内容</div>
                             </div>
                         </div>
 
@@ -3945,7 +4021,7 @@
             chinese: {
                 name: '中文风格',
                 useLegacy: false,
-                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
+                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'chinese' },
                 levels: {
                     title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num}、{text}' },
                     subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num}. {text}' },
@@ -4152,25 +4228,36 @@
 
             const renderLevelItem = (key, level) => {
                 const item = document.createElement('div');
-                item.className = 'config-item';
+                item.className = 'level-item';
                 item.style.marginBottom = '12px';
 
                 const typeOptions = ['ordered', 'unordered'].map(t =>
-                    `<option value="${t}" ${level.type === t ? 'selected' : ''}>${t === 'ordered' ? '有序列表' : '无序列表'}</option>`
+                    `<option value="${t}" ${level.type === t ? 'selected' : ''}>${t === 'ordered' ? '有序' : '无序'}</option>`
                 ).join('');
 
                 item.innerHTML = `
-                    <div style="display:flex;align-items:center;gap:12px;width:100%;flex-wrap:wrap;">
-                        <span class="config-item-label" style="min-width:80px;">${levelNames[key] || key}</span>
-                        <select class="config-item-input level-type" data-level="${key}" style="max-width:110px;">
+                    <div class="level-item-header">
+                        <span class="level-item-name">${levelNames[key] || key}</span>
+                        <select class="level-item-select level-type" data-level="${key}">
                             ${typeOptions}
                         </select>
-                        <span class="level-type-label" style="font-size:12px;color:var(--text-muted);width:60px;">${level.type === 'ordered' ? '序号:' : '符号:'}</span>
-                        <input type="text" class="config-item-input level-bullet" data-level="${key}" value="${level.bullet || '-'}" style="max-width:40px;" ${level.type === 'ordered' ? 'disabled' : ''}>
-                        <span style="font-size:12px;color:var(--text-muted);">缩进:</span>
-                        <input type="number" class="config-item-input level-indent" data-level="${key}" value="${level.indent || 0}" style="max-width:50px;">
-                        <span style="font-size:12px;color:var(--text-muted);">模板:</span>
-                        <input type="text" class="config-item-input level-template" data-level="${key}" value="${level.template || ''}" style="flex:1;min-width:200px;font-family:monospace;font-size:12px;">
+                    </div>
+                    <div class="level-item-body">
+                        <div class="level-item-row">
+                            <span class="level-item-label">${level.type === 'ordered' ? '序号符号' : '列表符号'}</span>
+                            <input type="text" class="level-item-input level-bullet" data-level="${key}" value="${level.bullet || '-'}" style="width:40px;" ${level.type === 'ordered' ? 'disabled' : ''}>
+                        </div>
+                        <div class="level-item-row">
+                            <span class="level-item-label">缩进级别</span>
+                            <input type="number" class="level-item-input level-indent" data-level="${key}" value="${level.indent || 0}" style="width:60px;">
+                        </div>
+                        <div class="level-item-row" style="flex:1;">
+                            <span class="level-item-label">格式模板</span>
+                            <input type="text" class="level-item-input level-template" data-level="${key}" value="${level.template || ''}" style="flex:1;font-family:monospace;font-size:12px;">
+                        </div>
+                    </div>
+                    <div class="level-item-hint">
+                        模板变量: {num} 序号 | {text} 文本 | {indent} 缩进 | {bullet} 符号 | {prefix} 前缀
                     </div>
                 `;
 
