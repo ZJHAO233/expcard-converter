@@ -1973,6 +1973,57 @@
             letter-spacing: 0.5px;
         }
 
+        /* 风格模板列表 */
+        .template-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .template-item {
+            padding: 14px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .template-item:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .template-item.active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .template-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .template-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .template-preview {
+            font-size: 11px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            padding: 8px;
+            background: var(--surface);
+            border-radius: 4px;
+        }
+
         /* 格式预览框 */
         .format-preview-box {
             background: var(--bg);
@@ -2991,9 +3042,46 @@
                         </div>
                     </div>
                     <div class="config-section-body">
+                        <!-- 风格模板 -->
+                        <div class="config-group">
+                            <div class="config-group-title">快速选择风格模板</div>
+                            <div class="template-list" id="templateList">
+                                <div class="template-item" data-template="default">
+                                    <div class="template-name">默认风格</div>
+                                    <div class="template-desc">保持原有输出格式</div>
+                                    <div class="template-preview">1. 试验内容<br>   1.1 条件A<br>      - 子条件</div>
+                                </div>
+                                <div class="template-item" data-template="simple">
+                                    <div class="template-name">简洁风格</div>
+                                    <div class="template-desc">纯数字编号，无符号</div>
+                                    <div class="template-preview">1 试验内容<br>   1.1 条件A<br>      子条件</div>
+                                </div>
+                                <div class="template-item" data-template="detailed">
+                                    <div class="template-name">详细风格</div>
+                                    <div class="template-desc">带括号和符号</div>
+                                    <div class="template-preview">(1) 试验内容<br>   (1.1) 条件A<br>      • 子条件</div>
+                                </div>
+                                <div class="template-item" data-template="mixed">
+                                    <div class="template-name">混合风格</div>
+                                    <div class="template-desc">标题数字，内容符号</div>
+                                    <div class="template-preview">1. 试验内容<br>   ▸ 条件A<br>      └ 子条件</div>
+                                </div>
+                                <div class="template-item" data-template="chinese">
+                                    <div class="template-name">中文风格</div>
+                                    <div class="template-desc">中文数字编号</div>
+                                    <div class="template-preview">一、试验内容<br>   1. 条件A<br>      (1) 子条件</div>
+                                </div>
+                                <div class="template-item" data-template="roman">
+                                    <div class="template-name">罗马风格</div>
+                                    <div class="template-desc">罗马数字编号</div>
+                                    <div class="template-preview">I. 试验内容<br>   I.1 条件A<br>      - 子条件</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- 格式预览 -->
                         <div class="format-preview-box">
-                            <div class="format-preview-title">格式预览</div>
+                            <div class="format-preview-title">实时预览</div>
                             <div class="format-preview-content" id="formatPreview">
                                 <div class="preview-line">1. 试验内容</div>
                                 <div class="preview-line preview-indent-1">1.1 条件A（且）</div>
@@ -3762,12 +3850,148 @@
         }
 
         // 渲染配置面板
+        // 风格模板定义
+        const STYLE_TEMPLATES = {
+            default: {
+                name: '默认风格',
+                useLegacy: true,
+                numbering: { enabled: false, separator: '.', startNum: 1, numType: 'arabic' },
+                levels: {
+                    title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num} {text}' },
+                    subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num} {text}' },
+                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}{num} {text}' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}{num} {text}' },
+                    content3: { type: 'unordered', prefix: '', bullet: '-', indent: 2, template: '{indent}{bullet} {text}' },
+                    content4: { type: 'unordered', prefix: '', bullet: '*', indent: 3, template: '{indent}{bullet} {text}' },
+                },
+                indent: { size: 3, char: ' ' }
+            },
+            simple: {
+                name: '简洁风格',
+                useLegacy: false,
+                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
+                levels: {
+                    title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num} {text}' },
+                    subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num} {text}' },
+                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}{num} {text}' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}{num} {text}' },
+                    content3: { type: 'ordered', prefix: '', bullet: '-', indent: 2, template: '{indent}{num} {text}' },
+                    content4: { type: 'ordered', prefix: '', bullet: '-', indent: 3, template: '{indent}{num} {text}' },
+                },
+                indent: { size: 3, char: ' ' }
+            },
+            detailed: {
+                name: '详细风格',
+                useLegacy: false,
+                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
+                levels: {
+                    title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}({num}) {text}' },
+                    subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}({num}) {text}' },
+                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}({num}) {text}' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}({num}) {text}' },
+                    content3: { type: 'unordered', prefix: '', bullet: '•', indent: 2, template: '{indent}{bullet} {text}' },
+                    content4: { type: 'unordered', prefix: '', bullet: '○', indent: 3, template: '{indent}{bullet} {text}' },
+                },
+                indent: { size: 3, char: ' ' }
+            },
+            mixed: {
+                name: '混合风格',
+                useLegacy: false,
+                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
+                levels: {
+                    title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num}. {text}' },
+                    subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}▸ {text}' },
+                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}{num}. {text}' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}▸ {text}' },
+                    content3: { type: 'unordered', prefix: '', bullet: '└', indent: 2, template: '{indent}{bullet} {text}' },
+                    content4: { type: 'unordered', prefix: '', bullet: '└', indent: 3, template: '{indent}{bullet} {text}' },
+                },
+                indent: { size: 3, char: ' ' }
+            },
+            chinese: {
+                name: '中文风格',
+                useLegacy: false,
+                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
+                levels: {
+                    title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num}、{text}' },
+                    subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num}. {text}' },
+                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}{num}. {text}' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}({num}) {text}' },
+                    content3: { type: 'unordered', prefix: '', bullet: '-', indent: 2, template: '{indent}- {text}' },
+                    content4: { type: 'unordered', prefix: '', bullet: '-', indent: 3, template: '{indent}- {text}' },
+                },
+                indent: { size: 3, char: ' ' }
+            },
+            roman: {
+                name: '罗马风格',
+                useLegacy: false,
+                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'roman' },
+                levels: {
+                    title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num}. {text}' },
+                    subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num} {text}' },
+                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}{num} {text}' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}{num} {text}' },
+                    content3: { type: 'unordered', prefix: '', bullet: '-', indent: 2, template: '{indent}{bullet} {text}' },
+                    content4: { type: 'unordered', prefix: '', bullet: '-', indent: 3, template: '{indent}{bullet} {text}' },
+                },
+                indent: { size: 3, char: ' ' }
+            }
+        };
+
+        // 应用风格模板
+        function applyTemplate(templateKey) {
+            const template = STYLE_TEMPLATES[templateKey];
+            if (!template) return;
+
+            currentConfig.OUTPUT_FORMAT = JSON.parse(JSON.stringify(template));
+            renderOutputFormat();
+            renderOutputLevels();
+            updateFormatPreview();
+
+            // 更新模板选中状态
+            document.querySelectorAll('.template-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.template === templateKey);
+            });
+        }
+
+        // 渲染配置面板
         function renderConfigPanel() {
             renderLogicOperators();
             renderSpecialSeparators();
             renderRowPatterns();
             renderOutputFormat();
             renderOutputLevels();
+            initTemplateList();
+        }
+
+        // 初始化模板列表
+        function initTemplateList() {
+            document.querySelectorAll('.template-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    applyTemplate(item.dataset.template);
+                });
+            });
+
+            // 根据当前配置高亮匹配的模板
+            highlightCurrentTemplate();
+        }
+
+        // 高亮当前匹配的模板
+        function highlightCurrentTemplate() {
+            const outputFormat = currentConfig.OUTPUT_FORMAT || DEFAULT_CONFIG.OUTPUT_FORMAT;
+            const isDefault = outputFormat.useLegacy === true;
+
+            document.querySelectorAll('.template-item').forEach(item => {
+                if (isDefault && item.dataset.template === 'default') {
+                    item.classList.add('active');
+                } else if (!isDefault) {
+                    // 简单匹配检查
+                    const template = STYLE_TEMPLATES[item.dataset.template];
+                    if (template && !template.useLegacy) {
+                        // 可以根据具体配置进一步匹配
+                    }
+                }
+            });
         }
 
         // 渲染输出格式设置
