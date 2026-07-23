@@ -1973,6 +1973,47 @@
             letter-spacing: 0.5px;
         }
 
+        /* 格式预览框 */
+        .format-preview-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .format-preview-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .format-preview-content {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+
+        .preview-line {
+            white-space: nowrap;
+        }
+
+        .preview-indent-1 {
+            padding-left: 24px;
+        }
+
+        .preview-indent-2 {
+            padding-left: 48px;
+        }
+
         .config-item {
             display: flex;
             align-items: center;
@@ -2950,6 +2991,19 @@
                         </div>
                     </div>
                     <div class="config-section-body">
+                        <!-- 格式预览 -->
+                        <div class="format-preview-box">
+                            <div class="format-preview-title">格式预览</div>
+                            <div class="format-preview-content" id="formatPreview">
+                                <div class="preview-line">1. 试验内容</div>
+                                <div class="preview-line preview-indent-1">1.1 条件A（且）</div>
+                                <div class="preview-line preview-indent-2">- 子条件1 或 子条件2</div>
+                                <div class="preview-line preview-indent-1">1.2 条件B</div>
+                                <div class="preview-line">2. 试验恢复</div>
+                                <div class="preview-line preview-indent-1">2.1 条件C</div>
+                            </div>
+                        </div>
+
                         <!-- 基本设置 -->
                         <div class="config-group">
                             <div class="config-group-title">基本设置</div>
