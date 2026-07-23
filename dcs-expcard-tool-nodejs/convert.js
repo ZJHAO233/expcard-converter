@@ -54,9 +54,11 @@ class ExpCardConverter {
   }
 
   _getDefaultOutputFormat() {
+    // 默认不启用自定义格式，保持原有输出
     return {
+      useLegacy: true,  // 使用原有格式
       numbering: {
-        enabled: true,
+        enabled: false,
         separator: ".",
         startNum: 1,
         numType: "arabic",
@@ -126,8 +128,18 @@ class ExpCardConverter {
     return text.trim();
   }
 
+  // 检查是否使用自定义格式
+  _useCustomFormat() {
+    return this.OUTPUT_FORMAT && !this.OUTPUT_FORMAT.useLegacy;
+  }
+
   // 格式化输出行
   _formatOutput(levelKey, text, levelIndex = 0) {
+    // 如果使用原有格式，直接返回文本
+    if (!this._useCustomFormat()) {
+      return text;
+    }
+
     const level = this.OUTPUT_FORMAT.levels[levelKey];
     if (!level) return text;
 
@@ -248,9 +260,13 @@ class ExpCardConverter {
 
     if (this._isChineseNumberTitle(seqNum)) {
       this.output.push("");
-      const titleText = this._extractTitleText(seqNum);
-      this._incrementCounter(0);
-      this.output.push(this._formatOutput('title', titleText));
+      if (this._useCustomFormat()) {
+        const titleText = this._extractTitleText(seqNum);
+        this._incrementCounter(0);
+        this.output.push(this._formatOutput('title', titleText));
+      } else {
+        this.output.push("## " + seqNum);
+      }
       this.inContentArea = false;
       this.skipSection = false;
       return;
@@ -275,9 +291,13 @@ class ExpCardConverter {
     if (this._isSubTitle(seqNum)) {
       const normalized = seqNum.replace(/\(/g, "（").replace(/\)/g, "）");
       this.output.push("");
-      const subTitleText = this._extractTitleText(normalized);
-      this._incrementCounter(1);
-      this.output.push(this._formatOutput('subTitle', subTitleText));
+      if (this._useCustomFormat()) {
+        const subTitleText = this._extractTitleText(normalized);
+        this._incrementCounter(1);
+        this.output.push(this._formatOutput('subTitle', subTitleText));
+      } else {
+        this.output.push("### " + normalized);
+      }
       this.output.push("");
       this.currentSubTitleLogic = this._extractTitleLogic(normalized);
       return;
@@ -411,10 +431,18 @@ class ExpCardConverter {
     }
 
     if (useSeqNum) {
-      this._incrementCounter(2);
-      this.output.push(this._formatOutput('content1', content + logicStr));
+      if (this._useCustomFormat()) {
+        this._incrementCounter(2);
+        this.output.push(this._formatOutput('content1', content + logicStr));
+      } else {
+        this.output.push(this.itemCounter + ". " + content + logicStr);
+      }
     } else {
-      this.output.push(this._formatOutput('content1', content + logicStr));
+      if (this._useCustomFormat()) {
+        this.output.push(this._formatOutput('content1', content + logicStr));
+      } else {
+        this.output.push(seqNum + ". " + content + logicStr);
+      }
     }
   }
 
@@ -442,8 +470,12 @@ class ExpCardConverter {
 
     if (logicIsLogic) {
       if (contentVal && !contentIsLogic) {
-        this._incrementCounter(3);
-        this.output.push(this._formatOutput('content2', contentVal));
+        if (this._useCustomFormat()) {
+          this._incrementCounter(3);
+          this.output.push(this._formatOutput('content2', contentVal));
+        } else {
+          this.output.push("   - " + contentVal);
+        }
         return;
       }
       return;
@@ -459,8 +491,12 @@ class ExpCardConverter {
     }
 
     if (content) {
-      this._incrementCounter(3);
-      this.output.push(this._formatOutput('content2', content));
+      if (this._useCustomFormat()) {
+        this._incrementCounter(3);
+        this.output.push(this._formatOutput('content2', content));
+      } else {
+        this.output.push("   - " + content);
+      }
     }
   }
 
@@ -567,7 +603,11 @@ class ExpCardConverter {
         }
       }
       const result = resultParts.join(" 或 ");
-      this.output.push(this._formatOutput('content3', result));
+      if (this._useCustomFormat()) {
+        this.output.push(this._formatOutput('content3', result));
+      } else {
+        this.output.push("   - " + result);
+      }
     }
   }
 
@@ -643,9 +683,17 @@ class ExpCardConverter {
       for (let i = 1; i < groupItems.length; i++) {
         result = result + separator + groupItems[i];
       }
-      this.output.push(this._formatOutput('content3', result));
+      if (this._useCustomFormat()) {
+        this.output.push(this._formatOutput('content3', result));
+      } else {
+        this.output.push("   - " + result);
+      }
     } else if (groupItems.length > 0) {
-      this.output.push(this._formatOutput('content3', groupItems[0]));
+      if (this._useCustomFormat()) {
+        this.output.push(this._formatOutput('content3', groupItems[0]));
+      } else {
+        this.output.push("   - " + groupItems[0]);
+      }
     }
   }
 
@@ -683,9 +731,13 @@ class ExpCardConverter {
 
     if (this._isChineseNumberTitle(seqNum)) {
       this.output.push("");
-      const titleText = this._extractTitleText(seqNum);
-      this._incrementCounter(0);
-      this.output.push(this._formatOutput('title', titleText));
+      if (this._useCustomFormat()) {
+        const titleText = this._extractTitleText(seqNum);
+        this._incrementCounter(0);
+        this.output.push(this._formatOutput('title', titleText));
+      } else {
+        this.output.push("## " + seqNum);
+      }
       this.inContentArea = false;
       this.skipSection = false;
       return;
@@ -710,9 +762,13 @@ class ExpCardConverter {
     if (this._isSubTitle(seqNum)) {
       const normalized = seqNum.replace(/\(/g, "（").replace(/\)/g, "）");
       this.output.push("");
-      const subTitleText = this._extractTitleText(normalized);
-      this._incrementCounter(1);
-      this.output.push(this._formatOutput('subTitle', subTitleText));
+      if (this._useCustomFormat()) {
+        const subTitleText = this._extractTitleText(normalized);
+        this._incrementCounter(1);
+        this.output.push(this._formatOutput('subTitle', subTitleText));
+      } else {
+        this.output.push("### " + normalized);
+      }
       this.output.push("");
       this.currentSubTitleLogic = this._extractTitleLogic(normalized);
       this.itemCounter = 0;
@@ -768,7 +824,11 @@ class ExpCardConverter {
     if (!logicIsLogic) {
       const content = logicCol || "";
       this.itemCounter += 1;
-      this.output.push(this.itemCounter + ". " + content);
+      if (this._useCustomFormat()) {
+        this.output.push(this._formatOutput('content1', content));
+      } else {
+        this.output.push(this.itemCounter + ". " + content);
+      }
       return;
     }
 
@@ -780,7 +840,11 @@ class ExpCardConverter {
       allRows,
       index,
     );
-    this.output.push(this._formatOutput('content1', result));
+    if (this._useCustomFormat()) {
+      this.output.push(this._formatOutput('content1', result));
+    } else {
+      this.output.push(this.itemCounter + ". " + result);
+    }
   }
 
   _processNewLevel2(itemNum, bLogic, row, allRows, index) {
@@ -948,10 +1012,17 @@ class ExpCardConverter {
     const outputLogic = this._getLogicOutput(dLogic);
     const separator = " " + outputLogic + " ";
     const result = items.join(separator);
-    if (items.length > 1) {
-      return this._formatOutput('content4', "（" + result + "）");
+    if (this._useCustomFormat()) {
+      if (items.length > 1) {
+        return this._formatOutput('content4', "（" + result + "）");
+      }
+      return this._formatOutput('content4', result);
+    } else {
+      if (items.length > 1) {
+        return "（" + result + "）";
+      }
+      return result;
     }
-    return this._formatOutput('content4', result);
   }
 
   _findEndIndex(allRows, startIndex, col) {

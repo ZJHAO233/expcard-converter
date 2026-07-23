@@ -54,7 +54,8 @@ function getDefaultConfig() {
       skipSectionStart: { type: "exact", values: ["试验条件"] },
     },
     OUTPUT_FORMAT: {
-      numbering: { enabled: true, separator: ".", startNum: 1, numType: "arabic" },
+      useLegacy: true,
+      numbering: { enabled: false, separator: ".", startNum: 1, numType: "arabic" },
       levels: {
         title: { type: "ordered", prefix: "## ", bullet: "-", indent: 0, template: "{prefix}{num} {text}" },
         subTitle: { type: "ordered", prefix: "### ", bullet: "-", indent: 0, template: "{prefix}{num} {text}" },

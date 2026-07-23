@@ -2813,6 +2813,20 @@
                     <div class="config-section-title">输出格式</div>
                     <div class="config-section-desc">自定义转换后的输出格式（序号、列表类型、模板等）</div>
 
+                    <!-- 基本设置 -->
+                    <div style="margin-bottom:16px;">
+                        <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">基本设置</div>
+                        <div class="config-row">
+                            <div class="config-item">
+                                <span class="config-item-label">使用原有格式</span>
+                                <select class="config-item-input" id="useLegacy" style="max-width:100px;">
+                                    <option value="true">是（保持默认）</option>
+                                    <option value="false">否（自定义格式）</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- 序号设置 -->
                     <div style="margin-bottom:16px;">
                         <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">序号设置</div>
@@ -3475,7 +3489,8 @@
                 skipSectionStart: { type: 'exact', values: ['试验条件'] }
             },
             OUTPUT_FORMAT: {
-                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
+                useLegacy: true,
+                numbering: { enabled: false, separator: '.', startNum: 1, numType: 'arabic' },
                 levels: {
                     title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num} {text}' },
                     subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num} {text}' },
@@ -3540,6 +3555,7 @@
             const numbering = outputFormat.numbering || {};
             const indent = outputFormat.indent || {};
 
+            document.getElementById('useLegacy').value = outputFormat.useLegacy !== false ? 'true' : 'false';
             document.getElementById('numberingEnabled').value = numbering.enabled !== false ? 'true' : 'false';
             document.getElementById('numberingNumType').value = numbering.numType || 'arabic';
             document.getElementById('numberingSeparator').value = numbering.separator || '.';
@@ -3626,6 +3642,7 @@
                 currentConfig.OUTPUT_FORMAT = JSON.parse(JSON.stringify(DEFAULT_CONFIG.OUTPUT_FORMAT));
             }
 
+            currentConfig.OUTPUT_FORMAT.useLegacy = document.getElementById('useLegacy').value === 'true';
             currentConfig.OUTPUT_FORMAT.numbering = {
                 enabled: document.getElementById('numberingEnabled').value === 'true',
                 separator: document.getElementById('numberingSeparator').value || '.',

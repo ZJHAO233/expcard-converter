@@ -178,7 +178,11 @@ const EXPCARD_CONFIG = {
   // ========================================================================
   OUTPUT_FORMAT: {
 
-    // 序号设置
+    // 是否使用原有格式（默认 true，不启用自定义格式）
+    // 设为 false 后可自定义输出格式
+    useLegacy: true,
+
+    // 序号设置（仅在 useLegacy: false 时生效）
     numbering: {
       enabled: true,              // 是否启用自动序号
       separator: ".",             // 层级分隔符
