@@ -3782,9 +3782,87 @@
             document.getElementById('numberingSeparator').value = numbering.separator || '.';
             document.getElementById('numberingStartNum').value = numbering.startNum || 1;
             document.getElementById('indentSize').value = indent.size || 3;
+
+            // 添加事件监听器更新预览
+            document.getElementById('useLegacy').addEventListener('change', updateFormatPreview);
+            document.getElementById('numberingEnabled').addEventListener('change', updateFormatPreview);
+            document.getElementById('numberingNumType').addEventListener('change', updateFormatPreview);
+            document.getElementById('numberingSeparator').addEventListener('change', updateFormatPreview);
+            document.getElementById('numberingStartNum').addEventListener('change', updateFormatPreview);
+            document.getElementById('indentSize').addEventListener('change', updateFormatPreview);
         }
 
         // 渲染层级格式
+        // 更新格式预览
+        function updateFormatPreview() {
+            const preview = document.getElementById('formatPreview');
+            if (!preview) return;
+
+            const outputFormat = currentConfig.OUTPUT_FORMAT || DEFAULT_CONFIG.OUTPUT_FORMAT;
+            const numbering = outputFormat.numbering || {};
+            const levels = outputFormat.levels || {};
+            const indentSize = (outputFormat.indent || {}).size || 3;
+
+            const numTypes = {
+                arabic: ['1', '2', '3', '1.1', '1.2', '2.1'],
+                roman: ['I', 'II', 'III', 'I.1', 'I.2', 'II.1'],
+                chinese: ['一', '二', '三', '一.1', '一.2', '二.1']
+            };
+            const nums = numTypes[numbering.numType] || numTypes.arabic;
+            const sep = numbering.separator || '.';
+
+            const makeIndent = (level) => '  '.repeat(indentSize * level);
+
+            let html = '';
+
+            // 一级标题
+            const titleLevel = levels.title || {};
+            if (titleLevel.type === 'ordered' && numbering.enabled !== false) {
+                html += `<div class="preview-line">${nums[0]} 试验内容</div>`;
+            } else {
+                html += `<div class="preview-line">- 试验内容</div>`;
+            }
+
+            // 二级标题
+            const subTitleLevel = levels.subTitle || {};
+            if (subTitleLevel.type === 'ordered' && numbering.enabled !== false) {
+                html += `<div class="preview-line preview-indent-1">${nums[0]}${sep}1 条件A（且）</div>`;
+            } else {
+                html += `<div class="preview-line preview-indent-1">- 条件A（且）</div>`;
+            }
+
+            // 三级内容
+            const content3Level = levels.content3 || {};
+            if (content3Level.type === 'ordered' && numbering.enabled !== false) {
+                html += `<div class="preview-line preview-indent-2">${makeIndent(content3Level.indent || 2)}${nums[3]}${sep}1 子条件1 或 子条件2</div>`;
+            } else {
+                html += `<div class="preview-line preview-indent-2">${makeIndent(content3Level.indent || 2)}${content3Level.bullet || '-'} 子条件1 或 子条件2</div>`;
+            }
+
+            // 二级标题2
+            if (subTitleLevel.type === 'ordered' && numbering.enabled !== false) {
+                html += `<div class="preview-line preview-indent-1">${nums[0]}${sep}2 条件B</div>`;
+            } else {
+                html += `<div class="preview-line preview-indent-1">- 条件B</div>`;
+            }
+
+            // 一级标题2
+            if (titleLevel.type === 'ordered' && numbering.enabled !== false) {
+                html += `<div class="preview-line">${nums[1]} 试验恢复</div>`;
+            } else {
+                html += `<div class="preview-line">- 试验恢复</div>`;
+            }
+
+            // 二级标题3
+            if (subTitleLevel.type === 'ordered' && numbering.enabled !== false) {
+                html += `<div class="preview-line preview-indent-1">${nums[1]}${sep}1 条件C</div>`;
+            } else {
+                html += `<div class="preview-line preview-indent-1">- 条件C</div>`;
+            }
+
+            preview.innerHTML = html;
+        }
+
         function renderOutputLevels() {
             const container = document.getElementById('outputLevelsList');
             container.innerHTML = '';
@@ -3839,22 +3917,28 @@
                     } else {
                         item.querySelector('.level-type-label').textContent = '符号:';
                     }
+                    updateFormatPreview();
                 });
 
                 bulletInput.addEventListener('change', (e) => {
                     levels[key].bullet = e.target.value;
+                    updateFormatPreview();
                 });
 
                 indentInput.addEventListener('change', (e) => {
                     levels[key].indent = parseInt(e.target.value) || 0;
+                    updateFormatPreview();
                 });
 
                 templateInput.addEventListener('change', (e) => {
                     levels[key].template = e.target.value;
+                    updateFormatPreview();
                 });
 
                 container.appendChild(item);
             }
+
+            updateFormatPreview();
         }
 
         // 同步输出格式到 currentConfig
