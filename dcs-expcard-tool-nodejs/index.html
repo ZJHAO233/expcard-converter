@@ -1973,6 +1973,27 @@
             letter-spacing: 0.5px;
         }
 
+        .config-subgroup {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: var(--surface);
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .config-subgroup:last-child {
+            margin-bottom: 0;
+        }
+
+        .config-subgroup-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         /* 风格模板列表 */
         .template-list {
             display: grid;
@@ -4094,6 +4115,10 @@
             const outputFormat = currentConfig.OUTPUT_FORMAT || DEFAULT_CONFIG.OUTPUT_FORMAT;
             const levels = outputFormat.levels || {};
 
+            // 分组显示：标题组和内容组
+            const titleLevels = ['title', 'subTitle'];
+            const contentLevels = ['content1', 'content2', 'content3', 'content4'];
+
             const levelNames = {
                 title: '一级标题',
                 subTitle: '二级标题',
@@ -4103,7 +4128,7 @@
                 content4: '四级内容'
             };
 
-            for (const [key, level] of Object.entries(levels)) {
+            const renderLevelItem = (key, level) => {
                 const item = document.createElement('div');
                 item.className = 'config-item';
                 item.style.marginBottom = '12px';
@@ -4160,7 +4185,31 @@
                 });
 
                 container.appendChild(item);
-            }
+            };
+
+            // 渲染标题组
+            const titleGroup = document.createElement('div');
+            titleGroup.className = 'config-subgroup';
+            titleGroup.innerHTML = '<div class="config-subgroup-title">标题格式</div>';
+            titleLevels.forEach(key => {
+                if (levels[key]) {
+                    renderLevelItem(key, levels[key]);
+                    titleGroup.appendChild(container.lastChild);
+                }
+            });
+            container.appendChild(titleGroup);
+
+            // 渲染内容组
+            const contentGroup = document.createElement('div');
+            contentGroup.className = 'config-subgroup';
+            contentGroup.innerHTML = '<div class="config-subgroup-title">内容格式</div>';
+            contentLevels.forEach(key => {
+                if (levels[key]) {
+                    renderLevelItem(key, levels[key]);
+                    contentGroup.appendChild(container.lastChild);
+                }
+            });
+            container.appendChild(contentGroup);
 
             updateFormatPreview();
         }
