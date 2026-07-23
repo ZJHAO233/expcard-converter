@@ -75,8 +75,23 @@ class ExpCardConverter {
     };
   }
 
-  // 格式化序号
-  _formatNumber(num, numType) {
+  // 生成层级序号（如 1.1.2）
+  _generateNumber() {
+    const numbering = this.OUTPUT_FORMAT.numbering;
+    if (!numbering.enabled) return '';
+
+    const parts = [];
+    for (let i = 0; i < this.numberCounters.length; i++) {
+      if (this.numberCounters[i] === 0 && i > 0) break;
+      parts.push(this._formatSingleNumber(this.numberCounters[i], numbering.numType));
+    }
+
+    const sep = numbering.separator || '.';
+    return parts.join(sep);
+  }
+
+  // 格式化单个序号
+  _formatSingleNumber(num, numType) {
     if (!numType || numType === 'arabic') return String(num);
     if (numType === 'roman') return this._toRoman(num);
     if (numType === 'chinese') return this._toChinese(num);
@@ -147,10 +162,8 @@ class ExpCardConverter {
     const indent = this._makeIndent(level.indent + levelIndex);
 
     let numStr = '';
-    if (numbering.enabled) {
-      if (level.type === 'ordered') {
-        numStr = this._formatNumber(this.numberCounters[level.indent + levelIndex], numbering.numType);
-      }
+    if (numbering.enabled && level.type === 'ordered') {
+      numStr = this._generateNumber();
     }
 
     const bullet = level.bullet || '-';
@@ -175,6 +188,11 @@ class ExpCardConverter {
   _incrementCounter(level) {
     this.numberCounters[level]++;
     this._resetChildCounters(level);
+    return this.numberCounters[level];
+  }
+
+  // 获取当前序号（不递增）
+  _getCounter(level) {
     return this.numberCounters[level];
   }
 
@@ -216,9 +234,8 @@ class ExpCardConverter {
     this._recordedPositions = new Set();
     this.itemCounter = 0;
 
-    // 初始化序号计数器
-    const startNum = this.OUTPUT_FORMAT.numbering.startNum || 1;
-    this.numberCounters = [startNum, 0, 0, 0, 0];
+    // 初始化序号计数器（从0开始，_incrementCounter会先递增）
+    this.numberCounters = [0, 0, 0, 0, 0];
     this.currentLevel = 0;
 
     for (let i = 0; i < rows.length; i++) {
@@ -432,13 +449,14 @@ class ExpCardConverter {
 
     if (useSeqNum) {
       if (this._useCustomFormat()) {
-        this._incrementCounter(2);
+        this._incrementCounter(1);
         this.output.push(this._formatOutput('content1', content + logicStr));
       } else {
         this.output.push(this.itemCounter + ". " + content + logicStr);
       }
     } else {
       if (this._useCustomFormat()) {
+        this._incrementCounter(1);
         this.output.push(this._formatOutput('content1', content + logicStr));
       } else {
         this.output.push(seqNum + ". " + content + logicStr);
@@ -471,7 +489,7 @@ class ExpCardConverter {
     if (logicIsLogic) {
       if (contentVal && !contentIsLogic) {
         if (this._useCustomFormat()) {
-          this._incrementCounter(3);
+          this._incrementCounter(2);
           this.output.push(this._formatOutput('content2', contentVal));
         } else {
           this.output.push("   - " + contentVal);
@@ -492,7 +510,7 @@ class ExpCardConverter {
 
     if (content) {
       if (this._useCustomFormat()) {
-        this._incrementCounter(3);
+        this._incrementCounter(2);
         this.output.push(this._formatOutput('content2', content));
       } else {
         this.output.push("   - " + content);
@@ -604,6 +622,7 @@ class ExpCardConverter {
       }
       const result = resultParts.join(" 或 ");
       if (this._useCustomFormat()) {
+        this._incrementCounter(3);
         this.output.push(this._formatOutput('content3', result));
       } else {
         this.output.push("   - " + result);
@@ -684,12 +703,14 @@ class ExpCardConverter {
         result = result + separator + groupItems[i];
       }
       if (this._useCustomFormat()) {
+        this._incrementCounter(3);
         this.output.push(this._formatOutput('content3', result));
       } else {
         this.output.push("   - " + result);
       }
     } else if (groupItems.length > 0) {
       if (this._useCustomFormat()) {
+        this._incrementCounter(3);
         this.output.push(this._formatOutput('content3', groupItems[0]));
       } else {
         this.output.push("   - " + groupItems[0]);
@@ -709,9 +730,8 @@ class ExpCardConverter {
     this._recordedPositions = new Set();
     this.itemCounter = 0;
 
-    // 初始化序号计数器
-    const startNum = this.OUTPUT_FORMAT.numbering.startNum || 1;
-    this.numberCounters = [startNum, 0, 0, 0, 0];
+    // 初始化序号计数器（从0开始，_incrementCounter会先递增）
+    this.numberCounters = [0, 0, 0, 0, 0];
     this.currentLevel = 0;
 
     for (let i = 0; i < rows.length; i++) {
