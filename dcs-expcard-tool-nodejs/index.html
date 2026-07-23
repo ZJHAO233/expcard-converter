@@ -1895,8 +1895,59 @@
         .config-modal-body {
             flex: 1;
             overflow-y: auto;
-            padding: 24px;
+            padding: 20px;
             background: var(--bg);
+        }
+
+        /* 标签页 */
+        .config-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 8px;
+            background: var(--surface);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .config-tab {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .config-tab:hover {
+            background: var(--bg);
+            color: var(--text-primary);
+        }
+
+        .config-tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .config-tab-icon {
+            font-size: 16px;
+        }
+
+        .config-tab-content {
+            display: none;
+        }
+
+        .config-tab-content.active {
+            display: block;
         }
 
         .config-modal-footer {
@@ -3034,149 +3085,161 @@
                 </button>
             </div>
             <div class="config-modal-body">
-                <!-- 逻辑运算符 -->
-                <div class="config-section">
-                    <div class="config-section-header">
-                        <div class="config-section-icon">🔗</div>
-                        <div>
-                            <div class="config-section-title">逻辑运算符映射</div>
-                            <div class="config-section-desc">将Excel中的逻辑运算符转换为输出格式</div>
+                <!-- 标签页导航 -->
+                <div class="config-tabs">
+                    <button class="config-tab active" data-tab="basic">
+                        <span class="config-tab-icon">⚙️</span>
+                        基本设置
+                    </button>
+                    <button class="config-tab" data-tab="detection">
+                        <span class="config-tab-icon">🔍</span>
+                        序号检测
+                    </button>
+                    <button class="config-tab" data-tab="style">
+                        <span class="config-tab-icon">🎨</span>
+                        样式修改
+                    </button>
+                </div>
+
+                <!-- 基本设置 -->
+                <div class="config-tab-content active" id="tab-basic">
+                    <!-- 逻辑运算符 -->
+                    <div class="config-section">
+                        <div class="config-section-header">
+                            <div class="config-section-icon">🔗</div>
+                            <div>
+                                <div class="config-section-title">逻辑运算符映射</div>
+                                <div class="config-section-desc">将Excel中的逻辑运算符转换为输出格式</div>
+                            </div>
+                        </div>
+                        <div class="config-section-body">
+                            <div id="logicOperatorsList"></div>
+                            <button class="config-btn config-btn-add" id="addLogicOperator">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                添加运算符
+                            </button>
                         </div>
                     </div>
-                    <div class="config-section-body">
-                        <div id="logicOperatorsList"></div>
-                        <button class="config-btn config-btn-add" id="addLogicOperator">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                            </svg>
-                            添加运算符
-                        </button>
+
+                    <!-- 特殊分隔符 -->
+                    <div class="config-section">
+                        <div class="config-section-header">
+                            <div class="config-section-icon">⚡</div>
+                            <div>
+                                <div class="config-section-title">特殊分隔符映射</div>
+                                <div class="config-section-desc">处理无法正常拼接的特殊逻辑（前缀匹配）</div>
+                            </div>
+                        </div>
+                        <div class="config-section-body">
+                            <div id="specialSeparatorsList"></div>
+                            <button class="config-btn config-btn-add" id="addSpecialSeparator">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                添加分隔符
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 特殊分隔符 -->
-                <div class="config-section">
-                    <div class="config-section-header">
-                        <div class="config-section-icon">⚡</div>
-                        <div>
-                            <div class="config-section-title">特殊分隔符映射</div>
-                            <div class="config-section-desc">处理无法正常拼接的特殊逻辑（前缀匹配）</div>
+                <!-- 序号检测 -->
+                <div class="config-tab-content" id="tab-detection">
+                    <div class="config-section">
+                        <div class="config-section-header">
+                            <div class="config-section-icon">📋</div>
+                            <div>
+                                <div class="config-section-title">行识别规则</div>
+                                <div class="config-section-desc">定义各类行的识别条件</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="config-section-body">
-                        <div id="specialSeparatorsList"></div>
-                        <button class="config-btn config-btn-add" id="addSpecialSeparator">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="12" y1="5" x2="12" y2="19"></line>
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                            </svg>
-                            添加分隔符
-                        </button>
+                        <div class="config-section-body">
+                            <div id="rowPatternsList"></div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 行识别规则 -->
-                <div class="config-section">
-                    <div class="config-section-header">
-                        <div class="config-section-icon">📋</div>
-                        <div>
-                            <div class="config-section-title">行识别规则</div>
-                            <div class="config-section-desc">定义各类行的识别条件</div>
+                <!-- 样式修改 -->
+                <div class="config-tab-content" id="tab-style">
+                    <!-- 格式预览 -->
+                    <div class="format-preview-box">
+                        <div class="format-preview-title">实时预览</div>
+                        <div class="format-preview-content" id="formatPreview">
+                            <div class="preview-line preview-title">一、试验内容</div>
+                            <div class="preview-line preview-subtitle preview-indent-1">1.1 试验条件（且）</div>
+                            <div class="preview-line preview-indent-1">1.1.1 条件A</div>
+                            <div class="preview-line preview-indent-2">- 子条件1 或 子条件2</div>
+                            <div class="preview-line preview-subtitle preview-indent-1">1.2 试验恢复</div>
+                            <div class="preview-line preview-title">二、结论</div>
+                            <div class="preview-line preview-subtitle preview-indent-1">2.1 结论内容</div>
                         </div>
                     </div>
-                    <div class="config-section-body">
-                        <div id="rowPatternsList"></div>
+
+                    <!-- 基本设置 -->
+                    <div class="config-group">
+                        <div class="config-group-title">基本设置</div>
+                        <div class="config-row">
+                            <div class="config-item">
+                                <span class="config-item-label">使用原有格式</span>
+                                <select class="config-item-input" id="useLegacy">
+                                    <option value="true">是（保持默认）</option>
+                                    <option value="false">否（自定义格式）</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <!-- 输出格式 -->
-                <div class="config-section">
-                    <div class="config-section-header">
-                        <div class="config-section-icon">📝</div>
-                        <div>
-                            <div class="config-section-title">输出格式</div>
-                            <div class="config-section-desc">自定义转换后的输出格式</div>
+                    <!-- 序号设置 -->
+                    <div class="config-group">
+                        <div class="config-group-title">序号设置</div>
+                        <div class="config-row">
+                            <div class="config-item">
+                                <span class="config-item-label">启用序号</span>
+                                <select class="config-item-input" id="numberingEnabled">
+                                    <option value="true">是</option>
+                                    <option value="false">否</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-item-label">数字类型</span>
+                                <select class="config-item-input" id="numberingNumType">
+                                    <option value="arabic">阿拉伯数字</option>
+                                    <option value="roman">罗马数字</option>
+                                    <option value="chinese">中文数字</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="config-row">
+                            <div class="config-item">
+                                <span class="config-item-label">分隔符</span>
+                                <input type="text" class="config-item-input config-item-input-sm" id="numberingSeparator" value=".">
+                            </div>
+                            <div class="config-item">
+                                <span class="config-item-label">起始序号</span>
+                                <input type="number" class="config-item-input config-item-input-sm" id="numberingStartNum" value="1">
+                            </div>
                         </div>
                     </div>
-                    <div class="config-section-body">
-                        <!-- 格式预览 -->
-                        <div class="format-preview-box">
-                            <div class="format-preview-title">实时预览</div>
-                            <div class="format-preview-content" id="formatPreview">
-                                <div class="preview-line preview-title">一、试验内容</div>
-                                <div class="preview-line preview-subtitle preview-indent-1">1.1 试验条件（且）</div>
-                                <div class="preview-line preview-indent-1">1.1.1 条件A</div>
-                                <div class="preview-line preview-indent-2">- 子条件1 或 子条件2</div>
-                                <div class="preview-line preview-subtitle preview-indent-1">1.2 试验恢复</div>
-                                <div class="preview-line preview-title">二、结论</div>
-                                <div class="preview-line preview-subtitle preview-indent-1">2.1 结论内容</div>
-                            </div>
-                        </div>
 
-                        <!-- 基本设置 -->
-                        <div class="config-group">
-                            <div class="config-group-title">基本设置</div>
-                            <div class="config-row">
-                                <div class="config-item">
-                                    <span class="config-item-label">使用原有格式</span>
-                                    <select class="config-item-input" id="useLegacy">
-                                        <option value="true">是（保持默认）</option>
-                                        <option value="false">否（自定义格式）</option>
-                                    </select>
-                                </div>
+                    <!-- 缩进设置 -->
+                    <div class="config-group">
+                        <div class="config-group-title">缩进设置</div>
+                        <div class="config-row">
+                            <div class="config-item">
+                                <span class="config-item-label">每级缩进</span>
+                                <input type="number" class="config-item-input config-item-input-sm" id="indentSize" value="3">
+                                <span class="config-item-unit">空格</span>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- 序号设置 -->
-                        <div class="config-group">
-                            <div class="config-group-title">序号设置</div>
-                            <div class="config-row">
-                                <div class="config-item">
-                                    <span class="config-item-label">启用序号</span>
-                                    <select class="config-item-input" id="numberingEnabled">
-                                        <option value="true">是</option>
-                                        <option value="false">否</option>
-                                    </select>
-                                </div>
-                                <div class="config-item">
-                                    <span class="config-item-label">数字类型</span>
-                                    <select class="config-item-input" id="numberingNumType">
-                                        <option value="arabic">阿拉伯数字</option>
-                                        <option value="roman">罗马数字</option>
-                                        <option value="chinese">中文数字</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="config-row">
-                                <div class="config-item">
-                                    <span class="config-item-label">分隔符</span>
-                                    <input type="text" class="config-item-input config-item-input-sm" id="numberingSeparator" value=".">
-                                </div>
-                                <div class="config-item">
-                                    <span class="config-item-label">起始序号</span>
-                                    <input type="number" class="config-item-input config-item-input-sm" id="numberingStartNum" value="1">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 缩进设置 -->
-                        <div class="config-group">
-                            <div class="config-group-title">缩进设置</div>
-                            <div class="config-row">
-                                <div class="config-item">
-                                    <span class="config-item-label">每级缩进</span>
-                                    <input type="number" class="config-item-input config-item-input-sm" id="indentSize" value="3">
-                                    <span class="config-item-unit">空格</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 各层级格式 -->
-                        <div class="config-group">
-                            <div class="config-group-title">层级格式</div>
-                            <div id="outputLevelsList"></div>
-                        </div>
+                    <!-- 各层级格式 -->
+                    <div class="config-group">
+                        <div class="config-group-title">层级格式</div>
+                        <div id="outputLevelsList"></div>
                     </div>
                 </div>
             </div>
@@ -3881,6 +3944,23 @@
             renderRowPatterns();
             renderOutputFormat();
             renderOutputLevels();
+            initConfigTabs();
+        }
+
+        // 初始化标签页
+        function initConfigTabs() {
+            document.querySelectorAll('.config-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // 移除所有active
+                    document.querySelectorAll('.config-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.config-tab-content').forEach(c => c.classList.remove('active'));
+
+                    // 添加active
+                    tab.classList.add('active');
+                    const tabId = tab.dataset.tab;
+                    document.getElementById('tab-' + tabId).classList.add('active');
+                });
+            });
         }
 
         // 渲染输出格式设置
