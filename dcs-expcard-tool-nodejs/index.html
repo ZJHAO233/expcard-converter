@@ -3158,8 +3158,34 @@
                                 <div class="template-item" data-template="default">
                                     <div class="template-name">默认风格</div>
                                     <div class="template-desc">保持原有输出格式</div>
-                                    <div class="template-preview">1. 试验内容<br>   1.1 条件A<br>      - 子条件</div>
+                                    <div class="template-preview">一、试验内容<br>   1. 试验条件<br>      1.1 条件A<br>         - 子条件</div>
                                 </div>
+                                <div class="template-item" data-template="simple">
+                                    <div class="template-name">简洁风格</div>
+                                    <div class="template-desc">中文标题 + 数字编号</div>
+                                    <div class="template-preview">一、试验内容<br>   1. 试验条件<br>      1.1 条件A<br>         - 子条件</div>
+                                </div>
+                                <div class="template-item" data-template="detailed">
+                                    <div class="template-name">详细风格</div>
+                                    <div class="template-desc">中文标题 + 括号编号</div>
+                                    <div class="template-preview">一、试验内容<br>   (1.1) 试验条件<br>      1.1 条件A<br>         - 子条件</div>
+                                </div>
+                                <div class="template-item" data-template="mixed">
+                                    <div class="template-name">混合风格</div>
+                                    <div class="template-desc">中文标题 + 符号</div>
+                                    <div class="template-preview">一、试验内容<br>   1. 试验条件<br>      1.1 条件A<br>         └ 子条件</div>
+                                </div>
+                                <div class="template-item" data-template="chinese">
+                                    <div class="template-name">中文风格</div>
+                                    <div class="template-desc">中文标题 + 括号子项</div>
+                                    <div class="template-preview">一、试验内容<br>   1. 试验条件<br>      (1.1) 条件A<br>         - 子条件</div>
+                                </div>
+                                <div class="template-item" data-template="roman">
+                                    <div class="template-name">罗马风格</div>
+                                    <div class="template-desc">罗马数字编号</div>
+                                    <div class="template-preview">I. 试验内容<br>   I.1 条件A<br>      - 子条件</div>
+                                </div>
+                            </div>
                                 <div class="template-item" data-template="simple">
                                     <div class="template-name">简洁风格</div>
                                     <div class="template-desc">纯数字编号，无符号</div>
@@ -3979,40 +4005,40 @@
             simple: {
                 name: '简洁风格',
                 useLegacy: false,
-                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
+                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'chinese' },
                 levels: {
-                    title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num} {text}' },
-                    subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num} {text}' },
-                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}{num} {text}' },
-                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}{num} {text}' },
-                    content3: { type: 'ordered', prefix: '', bullet: '-', indent: 2, template: '{indent}{num} {text}' },
-                    content4: { type: 'ordered', prefix: '', bullet: '-', indent: 3, template: '{indent}{num} {text}' },
+                    title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num}、{text}' },
+                    subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num}. {text}' },
+                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}{num}.{num2} {text}' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}{num}.{num2} {text}' },
+                    content3: { type: 'unordered', prefix: '', bullet: '-', indent: 2, template: '{indent}{bullet} {text}' },
+                    content4: { type: 'unordered', prefix: '', bullet: '-', indent: 3, template: '{indent}{bullet} {text}' },
                 },
                 indent: { size: 3, char: ' ' }
             },
             detailed: {
                 name: '详细风格',
                 useLegacy: false,
-                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
+                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'chinese' },
                 levels: {
-                    title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}({num}) {text}' },
-                    subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}({num}) {text}' },
-                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}({num}) {text}' },
-                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}({num}) {text}' },
-                    content3: { type: 'unordered', prefix: '', bullet: '•', indent: 2, template: '{indent}{bullet} {text}' },
-                    content4: { type: 'unordered', prefix: '', bullet: '○', indent: 3, template: '{indent}{bullet} {text}' },
+                    title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num}、{text}' },
+                    subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}({num}.{num2}) {text}' },
+                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}{num}.{num2} {text}' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}({num}.{num2}) {text}' },
+                    content3: { type: 'unordered', prefix: '', bullet: '-', indent: 2, template: '{indent}{bullet} {text}' },
+                    content4: { type: 'unordered', prefix: '', bullet: '-', indent: 3, template: '{indent}{bullet} {text}' },
                 },
                 indent: { size: 3, char: ' ' }
             },
             mixed: {
                 name: '混合风格',
                 useLegacy: false,
-                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
+                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'chinese' },
                 levels: {
-                    title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num}. {text}' },
-                    subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}▸ {text}' },
-                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}{num}. {text}' },
-                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}▸ {text}' },
+                    title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num}、{text}' },
+                    subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num}. {text}' },
+                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}{num}.{num2} {text}' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}{bullet} {text}' },
                     content3: { type: 'unordered', prefix: '', bullet: '└', indent: 2, template: '{indent}{bullet} {text}' },
                     content4: { type: 'unordered', prefix: '', bullet: '└', indent: 3, template: '{indent}{bullet} {text}' },
                 },
@@ -4025,10 +4051,10 @@
                 levels: {
                     title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num}、{text}' },
                     subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num}. {text}' },
-                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}{num}. {text}' },
-                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}({num}) {text}' },
-                    content3: { type: 'unordered', prefix: '', bullet: '-', indent: 2, template: '{indent}- {text}' },
-                    content4: { type: 'unordered', prefix: '', bullet: '-', indent: 3, template: '{indent}- {text}' },
+                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}{num}.{num2} {text}' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}({num}.{num2}) {text}' },
+                    content3: { type: 'unordered', prefix: '', bullet: '-', indent: 2, template: '{indent}{bullet} {text}' },
+                    content4: { type: 'unordered', prefix: '', bullet: '-', indent: 3, template: '{indent}{bullet} {text}' },
                 },
                 indent: { size: 3, char: ' ' }
             },
