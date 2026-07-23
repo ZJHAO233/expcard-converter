@@ -53,6 +53,18 @@ function getDefaultConfig() {
       contentStart: { type: "exact", values: ["试验内容"] },
       skipSectionStart: { type: "exact", values: ["试验条件"] },
     },
+    OUTPUT_FORMAT: {
+      numbering: { enabled: true, separator: ".", startNum: 1, numType: "arabic" },
+      levels: {
+        title: { type: "ordered", prefix: "## ", bullet: "-", indent: 0, template: "{prefix}{num} {text}" },
+        subTitle: { type: "ordered", prefix: "### ", bullet: "-", indent: 0, template: "{prefix}{num} {text}" },
+        content1: { type: "ordered", prefix: "", bullet: "-", indent: 0, template: "{indent}{num} {text}" },
+        content2: { type: "ordered", prefix: "", bullet: "-", indent: 1, template: "{indent}{num} {text}" },
+        content3: { type: "unordered", prefix: "", bullet: "-", indent: 2, template: "{indent}{bullet} {text}" },
+        content4: { type: "unordered", prefix: "", bullet: "*", indent: 3, template: "{indent}{bullet} {text}" },
+      },
+      indent: { size: 3, char: " " }
+    },
   };
 }
 
@@ -234,7 +246,36 @@ const EXPCARD_CONFIG = {
   //   1. 正则表达式中的反斜杠需要转义（如 \\d 而非 \d）
   //   2. 不配置的规则会使用内置默认值
   // ========================================================================
-  ROW_PATTERNS: ${JSON.stringify(config.ROW_PATTERNS || getDefaultConfig().ROW_PATTERNS, null, 4)}
+  ROW_PATTERNS: ${JSON.stringify(config.ROW_PATTERNS || getDefaultConfig().ROW_PATTERNS, null, 4)},
+
+  // ========================================================================
+  // 输出格式配置
+  // ========================================================================
+  // 用途：自定义转换后的输出格式
+  //
+  // 序号设置（numbering）：
+  //   - enabled:   是否启用自动序号
+  //   - separator: 层级分隔符（如 "." 或 "-"）
+  //   - startNum:  起始序号
+  //   - numType:   数字类型（arabic/roman/chinese）
+  //
+  // 各层级格式（levels）：
+  //   - type:     列表类型（ordered 有序 / unordered 无序）
+  //   - prefix:   Markdown 标题前缀（如 "## "）
+  //   - bullet:   无序列表符号（如 "-"、"*"、"+"）
+  //   - indent:   缩进级别（数字）
+  //   - template: 格式模板
+  //     {prefix}  - 标题前缀
+  //     {num}     - 序号
+  //     {text}    - 文本内容
+  //     {indent}  - 缩进
+  //     {bullet}  - 无序列表符号
+  //
+  // 缩进设置（indent）：
+  //   - size: 每级缩进空格数
+  //   - char: 缩进字符（空格或制表符）
+  // ========================================================================
+  OUTPUT_FORMAT: ${JSON.stringify(config.OUTPUT_FORMAT || getDefaultConfig().OUTPUT_FORMAT, null, 4)}
 };
 `;
 }

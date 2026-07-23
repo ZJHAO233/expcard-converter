@@ -2807,6 +2807,60 @@
                     <div class="config-section-desc">定义各类行的识别条件（支持精确匹配、正则匹配、前缀匹配三种类型）</div>
                     <div id="rowPatternsList"></div>
                 </div>
+
+                <!-- 输出格式 -->
+                <div class="config-section">
+                    <div class="config-section-title">输出格式</div>
+                    <div class="config-section-desc">自定义转换后的输出格式（序号、列表类型、模板等）</div>
+
+                    <!-- 序号设置 -->
+                    <div style="margin-bottom:16px;">
+                        <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">序号设置</div>
+                        <div class="config-row">
+                            <div class="config-item">
+                                <span class="config-item-label">启用序号</span>
+                                <select class="config-item-input" id="numberingEnabled" style="max-width:100px;">
+                                    <option value="true">是</option>
+                                    <option value="false">否</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-item-label">数字类型</span>
+                                <select class="config-item-input" id="numberingNumType" style="max-width:120px;">
+                                    <option value="arabic">阿拉伯数字 (1,2,3)</option>
+                                    <option value="roman">罗马数字 (I,II,III)</option>
+                                    <option value="chinese">中文数字 (一,二,三)</option>
+                                </select>
+                            </div>
+                            <div class="config-item">
+                                <span class="config-item-label">分隔符</span>
+                                <input type="text" class="config-item-input" id="numberingSeparator" value="." style="max-width:60px;">
+                            </div>
+                            <div class="config-item">
+                                <span class="config-item-label">起始序号</span>
+                                <input type="number" class="config-item-input" id="numberingStartNum" value="1" style="max-width:60px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 缩进设置 -->
+                    <div style="margin-bottom:16px;">
+                        <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">缩进设置</div>
+                        <div class="config-row">
+                            <div class="config-item">
+                                <span class="config-item-label">每级缩进</span>
+                                <input type="number" class="config-item-input" id="indentSize" value="3" style="max-width:60px;">
+                                <span style="color:var(--text-muted);font-size:12px;">空格</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 各层级格式 -->
+                    <div>
+                        <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px;">层级格式</div>
+                        <div id="outputLevelsList"></div>
+                    </div>
+                </div>
             </div>
             <div class="config-modal-footer">
                 <div class="config-btn-group">
@@ -3419,6 +3473,18 @@
                 paragraphTitle: { type: 'exact', values: ['试验条件', '试验恢复', '结论', '存在问题'] },
                 contentStart: { type: 'exact', values: ['试验内容'] },
                 skipSectionStart: { type: 'exact', values: ['试验条件'] }
+            },
+            OUTPUT_FORMAT: {
+                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
+                levels: {
+                    title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num} {text}' },
+                    subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num} {text}' },
+                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}{num} {text}' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}{num} {text}' },
+                    content3: { type: 'unordered', prefix: '', bullet: '-', indent: 2, template: '{indent}{bullet} {text}' },
+                    content4: { type: 'unordered', prefix: '', bullet: '*', indent: 3, template: '{indent}{bullet} {text}' },
+                },
+                indent: { size: 3, char: ' ' }
             }
         };
 
@@ -3464,6 +3530,113 @@
             renderLogicOperators();
             renderSpecialSeparators();
             renderRowPatterns();
+            renderOutputFormat();
+            renderOutputLevels();
+        }
+
+        // 渲染输出格式设置
+        function renderOutputFormat() {
+            const outputFormat = currentConfig.OUTPUT_FORMAT || DEFAULT_CONFIG.OUTPUT_FORMAT;
+            const numbering = outputFormat.numbering || {};
+            const indent = outputFormat.indent || {};
+
+            document.getElementById('numberingEnabled').value = numbering.enabled !== false ? 'true' : 'false';
+            document.getElementById('numberingNumType').value = numbering.numType || 'arabic';
+            document.getElementById('numberingSeparator').value = numbering.separator || '.';
+            document.getElementById('numberingStartNum').value = numbering.startNum || 1;
+            document.getElementById('indentSize').value = indent.size || 3;
+        }
+
+        // 渲染层级格式
+        function renderOutputLevels() {
+            const container = document.getElementById('outputLevelsList');
+            container.innerHTML = '';
+
+            const outputFormat = currentConfig.OUTPUT_FORMAT || DEFAULT_CONFIG.OUTPUT_FORMAT;
+            const levels = outputFormat.levels || {};
+
+            const levelNames = {
+                title: '一级标题',
+                subTitle: '二级标题',
+                content1: '一级内容',
+                content2: '二级内容',
+                content3: '三级内容',
+                content4: '四级内容'
+            };
+
+            for (const [key, level] of Object.entries(levels)) {
+                const item = document.createElement('div');
+                item.className = 'config-item';
+                item.style.marginBottom = '12px';
+
+                const typeOptions = ['ordered', 'unordered'].map(t =>
+                    `<option value="${t}" ${level.type === t ? 'selected' : ''}>${t === 'ordered' ? '有序列表' : '无序列表'}</option>`
+                ).join('');
+
+                item.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:12px;width:100%;flex-wrap:wrap;">
+                        <span class="config-item-label" style="min-width:80px;">${levelNames[key] || key}</span>
+                        <select class="config-item-input level-type" data-level="${key}" style="max-width:110px;">
+                            ${typeOptions}
+                        </select>
+                        <span class="level-type-label" style="font-size:12px;color:var(--text-muted);width:60px;">${level.type === 'ordered' ? '序号:' : '符号:'}</span>
+                        <input type="text" class="config-item-input level-bullet" data-level="${key}" value="${level.bullet || '-'}" style="max-width:40px;" ${level.type === 'ordered' ? 'disabled' : ''}>
+                        <span style="font-size:12px;color:var(--text-muted);">缩进:</span>
+                        <input type="number" class="config-item-input level-indent" data-level="${key}" value="${level.indent || 0}" style="max-width:50px;">
+                        <span style="font-size:12px;color:var(--text-muted);">模板:</span>
+                        <input type="text" class="config-item-input level-template" data-level="${key}" value="${level.template || ''}" style="flex:1;min-width:200px;font-family:monospace;font-size:12px;">
+                    </div>
+                `;
+
+                // 绑定事件
+                const typeSelect = item.querySelector('.level-type');
+                const bulletInput = item.querySelector('.level-bullet');
+                const indentInput = item.querySelector('.level-indent');
+                const templateInput = item.querySelector('.level-template');
+
+                typeSelect.addEventListener('change', (e) => {
+                    levels[key].type = e.target.value;
+                    bulletInput.disabled = e.target.value === 'ordered';
+                    if (e.target.value === 'ordered') {
+                        item.querySelector('.level-type-label').textContent = '序号:';
+                    } else {
+                        item.querySelector('.level-type-label').textContent = '符号:';
+                    }
+                });
+
+                bulletInput.addEventListener('change', (e) => {
+                    levels[key].bullet = e.target.value;
+                });
+
+                indentInput.addEventListener('change', (e) => {
+                    levels[key].indent = parseInt(e.target.value) || 0;
+                });
+
+                templateInput.addEventListener('change', (e) => {
+                    levels[key].template = e.target.value;
+                });
+
+                container.appendChild(item);
+            }
+        }
+
+        // 同步输出格式到 currentConfig
+        function syncOutputFormat() {
+            if (!currentConfig.OUTPUT_FORMAT) {
+                currentConfig.OUTPUT_FORMAT = JSON.parse(JSON.stringify(DEFAULT_CONFIG.OUTPUT_FORMAT));
+            }
+
+            currentConfig.OUTPUT_FORMAT.numbering = {
+                enabled: document.getElementById('numberingEnabled').value === 'true',
+                separator: document.getElementById('numberingSeparator').value || '.',
+                startNum: parseInt(document.getElementById('numberingStartNum').value) || 1,
+                numType: document.getElementById('numberingNumType').value || 'arabic'
+            };
+
+            currentConfig.OUTPUT_FORMAT.indent = {
+                size: parseInt(document.getElementById('indentSize').value) || 3,
+                char: ' '
+            };
         }
 
         // 同步逻辑运算符到 currentConfig
@@ -3730,6 +3903,7 @@
                 // 保存前同步数据
                 syncLogicOperators();
                 syncSpecialSeparators();
+                syncOutputFormat();
 
                 const response = await fetch('/api/config', {
                     method: 'POST',

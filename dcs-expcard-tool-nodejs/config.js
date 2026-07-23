@@ -8,6 +8,7 @@
  *   - LOGIC_OPERATORS:      逻辑运算符映射（Excel中的值 → 输出值）
  *   - SPECIAL_SEPARATORS:   特殊分隔符映射（前缀匹配，自动转换）
  *   - ROW_PATTERNS:         行识别规则（支持精确匹配、正则匹配、前缀匹配）
+ *   - OUTPUT_FORMAT:        输出格式配置（序号、列表类型、模板等）
  */
 
 const EXPCARD_CONFIG = {
@@ -146,5 +147,106 @@ const EXPCARD_CONFIG = {
       values: ["试验条件"],
       description: "跳过区间开始标记"
     }
-  }
+  },
+
+  // ========================================================================
+  // 输出格式配置
+  // ========================================================================
+  // 用途：自定义转换后的输出格式
+  //
+  // 序号设置：
+  //   - enabled:   是否启用自动序号
+  //   - separator: 层级分隔符（如 "." 或 "-"）
+  //   - startNum:  起始序号
+  //   - numType:   数字类型（arabic/roman/chinese）
+  //
+  // 各层级格式：
+  //   - type:     列表类型（ordered 有序 / unordered 无序）
+  //   - prefix:   Markdown 标题前缀（如 "## "）
+  //   - bullet:   无序列表符号（如 "-"、"*"、"+"）
+  //   - indent:   缩进级别（数字）
+  //   - template: 格式模板
+  //     {prefix}  - 标题前缀
+  //     {num}     - 序号
+  //     {text}    - 文本内容
+  //     {indent}  - 缩进
+  //     {bullet}  - 无序列表符号
+  //
+  // 缩进设置：
+  //   - size: 每级缩进空格数
+  //   - char: 缩进字符（空格或制表符）
+  // ========================================================================
+  OUTPUT_FORMAT: {
+
+    // 序号设置
+    numbering: {
+      enabled: true,              // 是否启用自动序号
+      separator: ".",             // 层级分隔符
+      startNum: 1,                // 起始序号
+      numType: "arabic",          // arabic(1,2,3) / roman(I,II,III) / chinese(一,二,三)
+    },
+
+    // 各层级格式配置
+    levels: {
+      // 一级标题（中文数字标题，如"一、试验内容"）
+      title: {
+        type: "ordered",         // ordered(有序) / unordered(无序)
+        prefix: "## ",           // Markdown 标题前缀
+        bullet: "-",             // 无序列表符号
+        indent: 0,               // 缩进级别
+        template: "{prefix}{num} {text}",
+      },
+
+      // 二级标题（子标题，如"1.1 试验条件（与）"）
+      subTitle: {
+        type: "ordered",
+        prefix: "### ",
+        bullet: "-",
+        indent: 0,
+        template: "{prefix}{num} {text}",
+      },
+
+      // 一级内容（纯数字行）
+      content1: {
+        type: "ordered",
+        prefix: "",
+        bullet: "-",
+        indent: 0,
+        template: "{indent}{num} {text}",
+      },
+
+      // 二级内容（子项）
+      content2: {
+        type: "ordered",
+        prefix: "",
+        bullet: "-",
+        indent: 1,
+        template: "{indent}{num} {text}",
+      },
+
+      // 三级内容（嵌套分组）
+      content3: {
+        type: "unordered",
+        prefix: "",
+        bullet: "-",
+        indent: 2,
+        template: "{indent}{bullet} {text}",
+      },
+
+      // 四级内容（最深层）
+      content4: {
+        type: "unordered",
+        prefix: "",
+        bullet: "*",
+        indent: 3,
+        template: "{indent}{bullet} {text}",
+      },
+    },
+
+    // 缩进设置
+    indent: {
+      size: 3,                    // 每级缩进空格数
+      char: " ",                  // 缩进字符
+    },
+  },
 };

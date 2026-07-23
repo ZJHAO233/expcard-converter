@@ -18,6 +18,9 @@ class ExpCardConverter {
     // 解析行识别规则
     this.ROW_PATTERNS = this._parseRowPatterns(config.ROW_PATTERNS);
 
+    // 输出格式配置
+    this.OUTPUT_FORMAT = config.OUTPUT_FORMAT || this._getDefaultOutputFormat();
+
     this.output = [];
     this.inContentArea = false;
     this.skipSection = false;
@@ -26,6 +29,10 @@ class ExpCardConverter {
     this.special_separator_positions = new Set();
     this._recordedPositions = new Set();
     this.itemCounter = 0;
+
+    // 序号计数器
+    this.numberCounters = [0, 0, 0, 0, 0]; // 最多支持5层
+    this.currentLevel = 0;
   }
 
   _getDefaultConfig() {
@@ -41,8 +48,122 @@ class ExpCardConverter {
         paragraphTitle: { type: 'exact', values: ['试验条件', '试验恢复', '结论', '存在问题'] },
         contentStart: { type: 'exact', values: ['试验内容'] },
         skipSectionStart: { type: 'exact', values: ['试验条件'] }
-      }
+      },
+      OUTPUT_FORMAT: this._getDefaultOutputFormat()
     };
+  }
+
+  _getDefaultOutputFormat() {
+    return {
+      numbering: {
+        enabled: true,
+        separator: ".",
+        startNum: 1,
+        numType: "arabic",
+      },
+      levels: {
+        title: { type: "ordered", prefix: "## ", bullet: "-", indent: 0, template: "{prefix}{num} {text}" },
+        subTitle: { type: "ordered", prefix: "### ", bullet: "-", indent: 0, template: "{prefix}{num} {text}" },
+        content1: { type: "ordered", prefix: "", bullet: "-", indent: 0, template: "{indent}{num} {text}" },
+        content2: { type: "ordered", prefix: "", bullet: "-", indent: 1, template: "{indent}{num} {text}" },
+        content3: { type: "unordered", prefix: "", bullet: "-", indent: 2, template: "{indent}{bullet} {text}" },
+        content4: { type: "unordered", prefix: "", bullet: "*", indent: 3, template: "{indent}{bullet} {text}" },
+      },
+      indent: { size: 3, char: " " }
+    };
+  }
+
+  // 格式化序号
+  _formatNumber(num, numType) {
+    if (!numType || numType === 'arabic') return String(num);
+    if (numType === 'roman') return this._toRoman(num);
+    if (numType === 'chinese') return this._toChinese(num);
+    return String(num);
+  }
+
+  _toRoman(num) {
+    const romanNumerals = [
+      [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
+      [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'],
+      [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']
+    ];
+    let result = '';
+    for (const [value, numeral] of romanNumerals) {
+      while (num >= value) {
+        result += numeral;
+        num -= value;
+      }
+    }
+    return result;
+  }
+
+  _toChinese(num) {
+    const chineseNums = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+    if (num <= 10) return chineseNums[num];
+    if (num < 20) return '十' + (num % 10 === 0 ? '' : chineseNums[num % 10]);
+    if (num < 100) {
+      const tens = Math.floor(num / 10);
+      const ones = num % 10;
+      return chineseNums[tens] + '十' + (ones === 0 ? '' : chineseNums[ones]);
+    }
+    return String(num); // 超过100用数字
+  }
+
+  // 生成缩进
+  _makeIndent(level) {
+    const { size = 3, char = ' ' } = this.OUTPUT_FORMAT.indent || {};
+    return char.repeat(size * level);
+  }
+
+  // 提取标题文字（去掉原始编号）
+  _extractTitleText(text) {
+    // 去掉中文数字编号：一、试验内容 → 试验内容
+    text = text.replace(/^[一二三四五六七八九十]+、\s*/, '');
+    // 去掉子标题编号：1.1 试验条件（与） → 试验条件（与）
+    text = text.replace(/^\d+\.\d+\s*/, '');
+    // 去掉纯数字编号：1. 试验内容 → 试验内容
+    text = text.replace(/^\d+[.、]\s*/, '');
+    return text.trim();
+  }
+
+  // 格式化输出行
+  _formatOutput(levelKey, text, levelIndex = 0) {
+    const level = this.OUTPUT_FORMAT.levels[levelKey];
+    if (!level) return text;
+
+    const numbering = this.OUTPUT_FORMAT.numbering;
+    const indent = this._makeIndent(level.indent + levelIndex);
+
+    let numStr = '';
+    if (numbering.enabled) {
+      if (level.type === 'ordered') {
+        numStr = this._formatNumber(this.numberCounters[level.indent + levelIndex], numbering.numType);
+      }
+    }
+
+    const bullet = level.bullet || '-';
+    const template = level.template || '{indent}{num} {text}';
+
+    return template
+      .replace('{prefix}', level.prefix || '')
+      .replace('{num}', numStr)
+      .replace('{text}', text)
+      .replace('{indent}', indent)
+      .replace('{bullet}', bullet);
+  }
+
+  // 重置子级序号
+  _resetChildCounters(level) {
+    for (let i = level + 1; i < this.numberCounters.length; i++) {
+      this.numberCounters[i] = 0;
+    }
+  }
+
+  // 递增序号
+  _incrementCounter(level) {
+    this.numberCounters[level]++;
+    this._resetChildCounters(level);
+    return this.numberCounters[level];
   }
 
   _parseRowPatterns(patterns) {
@@ -83,6 +204,11 @@ class ExpCardConverter {
     this._recordedPositions = new Set();
     this.itemCounter = 0;
 
+    // 初始化序号计数器
+    const startNum = this.OUTPUT_FORMAT.numbering.startNum || 1;
+    this.numberCounters = [startNum, 0, 0, 0, 0];
+    this.currentLevel = 0;
+
     for (let i = 0; i < rows.length; i++) {
       if (this.processedRows.has(i)) continue;
       this._processRow(rows[i], rows, i);
@@ -122,7 +248,9 @@ class ExpCardConverter {
 
     if (this._isChineseNumberTitle(seqNum)) {
       this.output.push("");
-      this.output.push("## " + seqNum);
+      const titleText = this._extractTitleText(seqNum);
+      this._incrementCounter(0);
+      this.output.push(this._formatOutput('title', titleText));
       this.inContentArea = false;
       this.skipSection = false;
       return;
@@ -147,7 +275,9 @@ class ExpCardConverter {
     if (this._isSubTitle(seqNum)) {
       const normalized = seqNum.replace(/\(/g, "（").replace(/\)/g, "）");
       this.output.push("");
-      this.output.push("### " + normalized);
+      const subTitleText = this._extractTitleText(normalized);
+      this._incrementCounter(1);
+      this.output.push(this._formatOutput('subTitle', subTitleText));
       this.output.push("");
       this.currentSubTitleLogic = this._extractTitleLogic(normalized);
       return;
@@ -281,9 +411,10 @@ class ExpCardConverter {
     }
 
     if (useSeqNum) {
-      this.output.push(this.itemCounter + ". " + content + logicStr);
+      this._incrementCounter(2);
+      this.output.push(this._formatOutput('content1', content + logicStr));
     } else {
-      this.output.push(seqNum + ". " + content + logicStr);
+      this.output.push(this._formatOutput('content1', content + logicStr));
     }
   }
 
@@ -311,7 +442,8 @@ class ExpCardConverter {
 
     if (logicIsLogic) {
       if (contentVal && !contentIsLogic) {
-        this.output.push("   - " + contentVal);
+        this._incrementCounter(3);
+        this.output.push(this._formatOutput('content2', contentVal));
         return;
       }
       return;
@@ -327,7 +459,8 @@ class ExpCardConverter {
     }
 
     if (content) {
-      this.output.push("   - " + content);
+      this._incrementCounter(3);
+      this.output.push(this._formatOutput('content2', content));
     }
   }
 
@@ -434,7 +567,7 @@ class ExpCardConverter {
         }
       }
       const result = resultParts.join(" 或 ");
-      this.output.push("   - " + result);
+      this.output.push(this._formatOutput('content3', result));
     }
   }
 
@@ -510,9 +643,9 @@ class ExpCardConverter {
       for (let i = 1; i < groupItems.length; i++) {
         result = result + separator + groupItems[i];
       }
-      this.output.push("   - " + result);
+      this.output.push(this._formatOutput('content3', result));
     } else if (groupItems.length > 0) {
-      this.output.push("   - " + groupItems[0]);
+      this.output.push(this._formatOutput('content3', groupItems[0]));
     }
   }
 
@@ -527,6 +660,11 @@ class ExpCardConverter {
     this.special_separator_positions = new Set();
     this._recordedPositions = new Set();
     this.itemCounter = 0;
+
+    // 初始化序号计数器
+    const startNum = this.OUTPUT_FORMAT.numbering.startNum || 1;
+    this.numberCounters = [startNum, 0, 0, 0, 0];
+    this.currentLevel = 0;
 
     for (let i = 0; i < rows.length; i++) {
       if (this.processedRows.has(i)) continue;
@@ -545,7 +683,9 @@ class ExpCardConverter {
 
     if (this._isChineseNumberTitle(seqNum)) {
       this.output.push("");
-      this.output.push("## " + seqNum);
+      const titleText = this._extractTitleText(seqNum);
+      this._incrementCounter(0);
+      this.output.push(this._formatOutput('title', titleText));
       this.inContentArea = false;
       this.skipSection = false;
       return;
@@ -570,7 +710,9 @@ class ExpCardConverter {
     if (this._isSubTitle(seqNum)) {
       const normalized = seqNum.replace(/\(/g, "（").replace(/\)/g, "）");
       this.output.push("");
-      this.output.push("### " + normalized);
+      const subTitleText = this._extractTitleText(normalized);
+      this._incrementCounter(1);
+      this.output.push(this._formatOutput('subTitle', subTitleText));
       this.output.push("");
       this.currentSubTitleLogic = this._extractTitleLogic(normalized);
       this.itemCounter = 0;
@@ -638,7 +780,7 @@ class ExpCardConverter {
       allRows,
       index,
     );
-    this.output.push(this.itemCounter + ". " + result);
+    this.output.push(this._formatOutput('content1', result));
   }
 
   _processNewLevel2(itemNum, bLogic, row, allRows, index) {
@@ -761,6 +903,16 @@ class ExpCardConverter {
     return result;
   }
 
+  _formatGroupOutput(levelKey, items, logic) {
+    const outputLogic = this._getLogicOutput(logic);
+    const separator = " " + outputLogic + " ";
+    const result = items.join(separator);
+    if (items.length > 1) {
+      return this._formatOutput(levelKey, "（" + result + "）");
+    }
+    return this._formatOutput(levelKey, result);
+  }
+
   _processNewLevel4(itemNum, dLogic, row, allRows, index) {
     this._recordSpecialSeparators(row, index);
 
@@ -797,9 +949,9 @@ class ExpCardConverter {
     const separator = " " + outputLogic + " ";
     const result = items.join(separator);
     if (items.length > 1) {
-      return "（" + result + "）";
+      return this._formatOutput('content4', "（" + result + "）");
     }
-    return result;
+    return this._formatOutput('content4', result);
   }
 
   _findEndIndex(allRows, startIndex, col) {
