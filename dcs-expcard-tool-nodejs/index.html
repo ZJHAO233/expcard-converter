@@ -3886,10 +3886,10 @@
                 useLegacy: true,
                 numbering: { enabled: false, separator: '.', startNum: 1, numType: 'arabic' },
                 levels: {
-                    title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num} {text}' },
-                    subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num} {text}' },
-                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}{num} {text}' },
-                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}{num} {text}' },
+                    title: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num} {text}', numType: 'chinese' },
+                    subTitle: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num} {text}', numType: 'arabic' },
+                    content1: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{indent}{num} {text}', numType: 'arabic' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}{num} {text}', numType: 'arabic' },
                     content3: { type: 'unordered', prefix: '', bullet: '-', indent: 2, template: '{indent}{bullet} {text}' },
                     content4: { type: 'unordered', prefix: '', bullet: '*', indent: 3, template: '{indent}{bullet} {text}' },
                 },
@@ -4001,34 +4001,38 @@
                 roman: ['I', 'II', 'III', 'I.1', 'I.2', 'II.1'],
                 chinese: ['一', '二', '三', '一.1', '一.2', '二.1']
             };
-            const nums = numTypes[numbering.numType] || numTypes.arabic;
-            const sep = numbering.separator || '.';
 
+            const sep = numbering.separator || '.';
             const makeIndent = (level) => '  '.repeat(indentSize * level);
 
             let html = '';
 
             // 一级标题（中文大标题格式）
             const titleLevel = levels.title || {};
-            const titlePrefix = (titleLevel.prefix || '## ').replace(/#+\s*/, '');
+            const titleNumType = titleLevel.numType || 'chinese';
+            const titleNums = numTypes[titleNumType] || numTypes.chinese;
             if (titleLevel.type === 'ordered' && numbering.enabled !== false) {
-                html += `<div class="preview-line preview-title">${nums[0]}、试验内容</div>`;
+                html += `<div class="preview-line preview-title">${titleNums[0]}、试验内容</div>`;
             } else {
                 html += `<div class="preview-line preview-title">一、试验内容</div>`;
             }
 
             // 二级标题（子标题格式）
             const subTitleLevel = levels.subTitle || {};
+            const subTitleNumType = subTitleLevel.numType || 'arabic';
+            const subTitleNums = numTypes[subTitleNumType] || numTypes.arabic;
             if (subTitleLevel.type === 'ordered' && numbering.enabled !== false) {
-                html += `<div class="preview-line preview-subtitle preview-indent-1">${nums[0]}${sep}1 试验条件（且）</div>`;
+                html += `<div class="preview-line preview-subtitle preview-indent-1">${subTitleNums[0]}${sep}1 试验条件（且）</div>`;
             } else {
                 html += `<div class="preview-line preview-subtitle preview-indent-1">1.1 试验条件（且）</div>`;
             }
 
             // 一级内容
             const content1Level = levels.content1 || {};
+            const content1NumType = content1Level.numType || 'arabic';
+            const content1Nums = numTypes[content1NumType] || numTypes.arabic;
             if (content1Level.type === 'ordered' && numbering.enabled !== false) {
-                html += `<div class="preview-line preview-indent-1">${makeIndent(content1Level.indent || 1)}${nums[0]}${sep}1 条件A</div>`;
+                html += `<div class="preview-line preview-indent-1">${makeIndent(content1Level.indent || 1)}${content1Nums[0]}${sep}1 条件A</div>`;
             } else {
                 html += `<div class="preview-line preview-indent-1">${makeIndent(content1Level.indent || 1)}${content1Level.bullet || '-'} 条件A</div>`;
             }
@@ -4036,21 +4040,23 @@
             // 三级内容
             const content3Level = levels.content3 || {};
             if (content3Level.type === 'ordered' && numbering.enabled !== false) {
-                html += `<div class="preview-line preview-indent-2">${makeIndent(content3Level.indent || 2)}${nums[3]}${sep}1 子条件1 或 子条件2</div>`;
+                const content3NumType = content3Level.numType || 'arabic';
+                const content3Nums = numTypes[content3NumType] || numTypes.arabic;
+                html += `<div class="preview-line preview-indent-2">${makeIndent(content3Level.indent || 2)}${content3Nums[0]}${sep}1 子条件1 或 子条件2</div>`;
             } else {
                 html += `<div class="preview-line preview-indent-2">${makeIndent(content3Level.indent || 2)}${content3Level.bullet || '-'} 子条件1 或 子条件2</div>`;
             }
 
             // 二级标题2
             if (subTitleLevel.type === 'ordered' && numbering.enabled !== false) {
-                html += `<div class="preview-line preview-subtitle preview-indent-1">${nums[0]}${sep}2 试验恢复</div>`;
+                html += `<div class="preview-line preview-subtitle preview-indent-1">${subTitleNums[0]}${sep}2 试验恢复</div>`;
             } else {
                 html += `<div class="preview-line preview-subtitle preview-indent-1">1.2 试验恢复</div>`;
             }
 
             // 一级标题2
             if (titleLevel.type === 'ordered' && numbering.enabled !== false) {
-                html += `<div class="preview-line preview-title">${nums[1]}、结论</div>`;
+                html += `<div class="preview-line preview-title">${titleNums[1]}、结论</div>`;
             } else {
                 html += `<div class="preview-line preview-title">二、结论</div>`;
             }
@@ -4094,6 +4100,10 @@
                     `<option value="${t}" ${level.type === t ? 'selected' : ''}>${t === 'ordered' ? '有序' : '无序'}</option>`
                 ).join('');
 
+                const numTypeOptions = ['arabic', 'roman', 'chinese'].map(t =>
+                    `<option value="${t}" ${(level.numType || 'arabic') === t ? 'selected' : ''}>${t === 'arabic' ? '阿拉伯' : t === 'roman' ? '罗马' : '中文'}</option>`
+                ).join('');
+
                 item.innerHTML = `
                     <div class="level-item-header">
                         <span class="level-item-name">${levelNames[key] || key}</span>
@@ -4102,6 +4112,12 @@
                         </select>
                     </div>
                     <div class="level-item-body">
+                        <div class="level-item-row" ${level.type !== 'ordered' ? 'style="display:none;"' : ''}>
+                            <span class="level-item-label">数字类型</span>
+                            <select class="level-item-select level-numType" data-level="${key}">
+                                ${numTypeOptions}
+                            </select>
+                        </div>
                         <div class="level-item-row">
                             <span class="level-item-label">${level.type === 'ordered' ? '序号符号' : '列表符号'}</span>
                             <input type="text" class="level-item-input level-bullet" data-level="${key}" value="${level.bullet || '-'}" style="width:40px;" ${level.type === 'ordered' ? 'disabled' : ''}>
@@ -4122,18 +4138,21 @@
 
                 // 绑定事件
                 const typeSelect = item.querySelector('.level-type');
+                const numTypeSelect = item.querySelector('.level-numType');
                 const bulletInput = item.querySelector('.level-bullet');
                 const indentInput = item.querySelector('.level-indent');
                 const templateInput = item.querySelector('.level-template');
+                const numTypeRow = item.querySelector('.level-item-row');
 
                 typeSelect.addEventListener('change', (e) => {
                     levels[key].type = e.target.value;
                     bulletInput.disabled = e.target.value === 'ordered';
-                    if (e.target.value === 'ordered') {
-                        item.querySelector('.level-type-label').textContent = '序号:';
-                    } else {
-                        item.querySelector('.level-type-label').textContent = '符号:';
-                    }
+                    numTypeRow.style.display = e.target.value === 'ordered' ? 'flex' : 'none';
+                    updateFormatPreview();
+                });
+
+                numTypeSelect.addEventListener('change', (e) => {
+                    levels[key].numType = e.target.value;
                     updateFormatPreview();
                 });
 
