@@ -2078,6 +2078,19 @@
             white-space: nowrap;
         }
 
+        .preview-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .preview-subtitle {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
         .preview-indent-1 {
             padding-left: 24px;
         }
@@ -4060,20 +4073,29 @@
 
             let html = '';
 
-            // 一级标题
+            // 一级标题（中文大标题格式）
             const titleLevel = levels.title || {};
+            const titlePrefix = (titleLevel.prefix || '## ').replace(/#+\s*/, '');
             if (titleLevel.type === 'ordered' && numbering.enabled !== false) {
-                html += `<div class="preview-line">${nums[0]} 试验内容</div>`;
+                html += `<div class="preview-line preview-title">${nums[0]}、试验内容</div>`;
             } else {
-                html += `<div class="preview-line">- 试验内容</div>`;
+                html += `<div class="preview-line preview-title">一、试验内容</div>`;
             }
 
-            // 二级标题
+            // 二级标题（子标题格式）
             const subTitleLevel = levels.subTitle || {};
             if (subTitleLevel.type === 'ordered' && numbering.enabled !== false) {
-                html += `<div class="preview-line preview-indent-1">${nums[0]}${sep}1 条件A（且）</div>`;
+                html += `<div class="preview-line preview-subtitle preview-indent-1">${nums[0]}${sep}1 试验条件（且）</div>`;
             } else {
-                html += `<div class="preview-line preview-indent-1">- 条件A（且）</div>`;
+                html += `<div class="preview-line preview-subtitle preview-indent-1">1.1 试验条件（且）</div>`;
+            }
+
+            // 一级内容
+            const content1Level = levels.content1 || {};
+            if (content1Level.type === 'ordered' && numbering.enabled !== false) {
+                html += `<div class="preview-line preview-indent-1">${makeIndent(content1Level.indent || 1)}${nums[0]}${sep}1 条件A</div>`;
+            } else {
+                html += `<div class="preview-line preview-indent-1">${makeIndent(content1Level.indent || 1)}${content1Level.bullet || '-'} 条件A</div>`;
             }
 
             // 三级内容
@@ -4086,23 +4108,23 @@
 
             // 二级标题2
             if (subTitleLevel.type === 'ordered' && numbering.enabled !== false) {
-                html += `<div class="preview-line preview-indent-1">${nums[0]}${sep}2 条件B</div>`;
+                html += `<div class="preview-line preview-subtitle preview-indent-1">${nums[0]}${sep}2 试验恢复</div>`;
             } else {
-                html += `<div class="preview-line preview-indent-1">- 条件B</div>`;
+                html += `<div class="preview-line preview-subtitle preview-indent-1">1.2 试验恢复</div>`;
             }
 
             // 一级标题2
             if (titleLevel.type === 'ordered' && numbering.enabled !== false) {
-                html += `<div class="preview-line">${nums[1]} 试验恢复</div>`;
+                html += `<div class="preview-line preview-title">${nums[1]}、结论</div>`;
             } else {
-                html += `<div class="preview-line">- 试验恢复</div>`;
+                html += `<div class="preview-line preview-title">二、结论</div>`;
             }
 
             // 二级标题3
             if (subTitleLevel.type === 'ordered' && numbering.enabled !== false) {
-                html += `<div class="preview-line preview-indent-1">${nums[1]}${sep}1 条件C</div>`;
+                html += `<div class="preview-line preview-subtitle preview-indent-1">${nums[1]}${sep}1 结论内容</div>`;
             } else {
-                html += `<div class="preview-line preview-indent-1">- 条件C</div>`;
+                html += `<div class="preview-line preview-subtitle preview-indent-1">2.1 结论内容</div>`;
             }
 
             preview.innerHTML = html;
