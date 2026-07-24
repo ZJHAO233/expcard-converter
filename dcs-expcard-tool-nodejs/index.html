@@ -2120,6 +2120,56 @@
             font-family: monospace;
         }
 
+        /* 风格模板列表 */
+        .template-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .template-item {
+            padding: 14px;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .template-item:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .template-item.active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .template-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .template-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .template-preview {
+            font-size: 11px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            padding: 8px;
+            background: var(--bg);
+            border-radius: 4px;
+        }
+
         /* 格式预览框 */
         .format-preview-box {
             background: var(--bg);
@@ -3168,6 +3218,28 @@
 
                 <!-- 样式修改 -->
                 <div class="config-tab-content" id="tab-style">
+                        <!-- 风格模板 -->
+                        <div class="config-group">
+                            <div class="config-group-title">选择风格模板</div>
+                            <div class="template-list" id="templateList">
+                                <div class="template-item" data-template="template1">
+                                    <div class="template-name">子编号风格</div>
+                                    <div class="template-desc">一级内容用 1.1. 格式</div>
+                                    <div class="template-preview">一、试验内容<br>   一、试验条件<br>      1.1. 条件A<br>         - 子条件</div>
+                                </div>
+                                <div class="template-item" data-template="template2">
+                                    <div class="template-name">全无序风格</div>
+                                    <div class="template-desc">内容全部用无序列表</div>
+                                    <div class="template-preview">一、试验内容<br>   一、试验条件<br>      - 条件A<br>         - 子条件</div>
+                                </div>
+                                <div class="template-item" data-template="template3">
+                                    <div class="template-name">括号风格</div>
+                                    <div class="template-desc">一级内容用 (1.1) 格式</div>
+                                    <div class="template-preview">一、试验内容<br>   一、试验条件<br>      (1.1) 条件A<br>         - 子条件</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- 格式预览 -->
                         <div class="format-preview-box">
                             <div class="format-preview-title">实时预览</div>
@@ -3944,8 +4016,70 @@
             }
         }
 
-        // 渲染配置面板
+        // 风格模板定义
+        const STYLE_TEMPLATES = {
+            template1: {
+                name: '子编号风格',
+                description: '一级内容用 1.1. 格式',
+                useLegacy: false,
+                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
+                levels: {
+                    title: { type: 'ordered', prefix: '# ', bullet: '-', indent: 0, template: '{prefix}{text}', numType: 'chinese' },
+                    subTitle: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num}、{text}', numType: 'chinese' },
+                    content1: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num}. {text}', numType: 'arabic' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}{parentNum}.{num}. {text}', numType: 'arabic' },
+                    content3: { type: 'unordered', prefix: '', bullet: '-', indent: 2, template: '{indent}{bullet} {text}' },
+                    content4: { type: 'unordered', prefix: '', bullet: '-', indent: 3, template: '{indent}{bullet} {text}' },
+                },
+                indent: { size: 3, char: ' ' }
+            },
+            template2: {
+                name: '全无序风格',
+                description: '内容全部用无序列表',
+                useLegacy: false,
+                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
+                levels: {
+                    title: { type: 'ordered', prefix: '# ', bullet: '-', indent: 0, template: '{prefix}{text}', numType: 'chinese' },
+                    subTitle: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num}、{text}', numType: 'chinese' },
+                    content1: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num}. {text}', numType: 'arabic' },
+                    content2: { type: 'unordered', prefix: '', bullet: '-', indent: 1, template: '{indent}{bullet} {text}' },
+                    content3: { type: 'unordered', prefix: '', bullet: '-', indent: 2, template: '{indent}{bullet} {text}' },
+                    content4: { type: 'unordered', prefix: '', bullet: '-', indent: 3, template: '{indent}{bullet} {text}' },
+                },
+                indent: { size: 3, char: ' ' }
+            },
+            template3: {
+                name: '括号风格',
+                description: '一级内容用 (1.1) 格式',
+                useLegacy: false,
+                numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
+                levels: {
+                    title: { type: 'ordered', prefix: '# ', bullet: '-', indent: 0, template: '{prefix}{text}', numType: 'chinese' },
+                    subTitle: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num}、{text}', numType: 'chinese' },
+                    content1: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num}. {text}', numType: 'arabic' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}({parentNum}.{num}) {text}', numType: 'arabic' },
+                    content3: { type: 'unordered', prefix: '', bullet: '-', indent: 2, template: '{indent}{bullet} {text}' },
+                    content4: { type: 'unordered', prefix: '', bullet: '-', indent: 3, template: '{indent}{bullet} {text}' },
+                },
+                indent: { size: 3, char: ' ' }
+            }
+        };
 
+        // 应用风格模板
+        function applyTemplate(templateKey) {
+            const template = STYLE_TEMPLATES[templateKey];
+            if (!template) return;
+
+            currentConfig.OUTPUT_FORMAT = JSON.parse(JSON.stringify(template));
+            renderOutputFormat();
+            renderOutputLevels();
+            updateFormatPreview();
+
+            // 更新模板选中状态
+            document.querySelectorAll('.template-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.template === templateKey);
+            });
+        }
 
         // 渲染配置面板
         function renderConfigPanel() {
@@ -3955,6 +4089,7 @@
             renderOutputFormat();
             renderOutputLevels();
             initConfigTabs();
+            initTemplateList();
         }
 
         // 初始化标签页（只绑定一次）
@@ -3973,6 +4108,19 @@
                     tab.classList.add('active');
                     const tabId = tab.dataset.tab;
                     document.getElementById('tab-' + tabId).classList.add('active');
+                });
+            });
+        }
+
+        // 初始化模板列表
+        let templateListInitialized = false;
+        function initTemplateList() {
+            if (templateListInitialized) return;
+            templateListInitialized = true;
+
+            document.querySelectorAll('.template-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    applyTemplate(item.dataset.template);
                 });
             });
         }
