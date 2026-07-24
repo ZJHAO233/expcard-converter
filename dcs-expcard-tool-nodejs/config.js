@@ -194,59 +194,59 @@ const EXPCARD_CONFIG = {
     levels: {
       // 一级标题（保持原样，来自Excel）
       title: {
-        type: "ordered",         // ordered(有序) / unordered(无序)
-        prefix: "",              // 不添加前缀
-        bullet: "-",             // 无序列表符号
-        indent: 0,               // 缩进级别
-        template: "{prefix}{text}",
-        numType: "chinese",      // 中文数字
-      },
-
-      // 二级标题（中文数字+顿号，如"一、试验条件"）
-      subTitle: {
         type: "ordered",
-        prefix: "## ",
+        prefix: "",
         bullet: "-",
         indent: 0,
-        template: "{prefix}{num}、{text}",
+        template: "{prefix}{text}",
         numType: "chinese",
       },
 
-      // 三级标题/一级内容（纯数字+点，如"1. 试验内容"）
+      // 二级标题（保持原样，来自Excel）
+      subTitle: {
+        type: "ordered",
+        prefix: "",
+        bullet: "-",
+        indent: 0,
+        template: "{prefix}{text}",
+        numType: "chinese",
+      },
+
+      // 三级标题（保持原样，来自Excel）
       content1: {
         type: "ordered",
         prefix: "",
         bullet: "-",
         indent: 0,
-        template: "{indent}{num}. {text}",
+        template: "{prefix}{text}",
         numType: "arabic",
       },
 
-      // 二级内容（子编号，如"1.1 条件A"）
+      // 一级内容（数字+.格式）
       content2: {
         type: "ordered",
         prefix: "",
         bullet: "-",
-        indent: 1,
+        indent: 0,
         template: "{indent}{num}. {text}",
         numType: "arabic",
       },
 
-      // 三级内容（无序列表）
+      // 二级内容（无序列表）
       content3: {
         type: "unordered",
         prefix: "",
         bullet: "-",
-        indent: 2,
+        indent: 1,
         template: "{indent}{bullet} {text}",
       },
 
-      // 四级内容（无序列表）
+      // 三级内容（无序列表）
       content4: {
         type: "unordered",
         prefix: "",
         bullet: "-",
-        indent: 3,
+        indent: 2,
         template: "{indent}{bullet} {text}",
       },
     },

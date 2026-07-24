@@ -85,20 +85,20 @@ class ExpCardConverter {
     // 根据层级返回不同的序号格式
     switch (levelKey) {
       case 'title':
-        // 一级标题：不管，保持原样
+        // 一级标题：保持原样
         return '';
       case 'subTitle':
-        // 二级标题：中文数字（一、二、三）
-        return this._toChinese(this.numberCounters[1]);
+        // 二级标题：保持原样
+        return '';
       case 'content1':
+        // 三级标题：保持原样
+        return '';
+      case 'content2':
         // 一级内容：1. 2. 3.
         return String(this.numberCounters[2]);
-      case 'content2':
-        // 二级内容：1.1 1.2 1.3
-        return String(this.numberCounters[2]) + sep + String(this.numberCounters[3]);
       case 'content3':
       case 'content4':
-        // 三级、四级内容：无序列表
+        // 二级、三级内容：无序列表
         return '';
       default:
         return '';
@@ -465,14 +465,14 @@ class ExpCardConverter {
     if (useSeqNum) {
       if (this._useCustomFormat()) {
         this._incrementCounter(2);
-        this.output.push(this._formatOutput('content1', content + logicStr));
+        this.output.push(this._formatOutput('content2', content + logicStr));
       } else {
         this.output.push(this.itemCounter + ". " + content + logicStr);
       }
     } else {
       if (this._useCustomFormat()) {
         this._incrementCounter(2);
-        this.output.push(this._formatOutput('content1', content + logicStr));
+        this.output.push(this._formatOutput('content2', content + logicStr));
       } else {
         this.output.push(seqNum + ". " + content + logicStr);
       }
