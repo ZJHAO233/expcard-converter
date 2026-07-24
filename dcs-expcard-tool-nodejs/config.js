@@ -215,10 +215,10 @@ const EXPCARD_CONFIG = {
       // 三级标题/一级内容（纯数字+点，如"1. 试验内容"）
       content1: {
         type: "ordered",
-        prefix: "### ",
+        prefix: "",
         bullet: "-",
         indent: 0,
-        template: "{prefix}{num}. {text}",
+        template: "{indent}{num}. {text}",
         numType: "arabic",
       },
 
