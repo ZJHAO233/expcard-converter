@@ -3225,17 +3225,17 @@
                                 <div class="template-item" data-template="template1">
                                     <div class="template-name">子编号风格</div>
                                     <div class="template-desc">一级内容用 1.1. 格式</div>
-                                    <div class="template-preview">一、试验内容<br>   一、试验条件<br>      1.1. 条件A<br>         - 子条件</div>
+                                    <div class="template-preview"># Sheet页名<br>## 一、试验条件<br>### 1. 试验内容<br>1.1. 条件A<br>- 子条件</div>
                                 </div>
                                 <div class="template-item" data-template="template2">
                                     <div class="template-name">全无序风格</div>
                                     <div class="template-desc">内容全部用无序列表</div>
-                                    <div class="template-preview">一、试验内容<br>   一、试验条件<br>      - 条件A<br>         - 子条件</div>
+                                    <div class="template-preview"># Sheet页名<br>## 一、试验条件<br>### 1. 试验内容<br>- 条件A<br>- 子条件</div>
                                 </div>
                                 <div class="template-item" data-template="template3">
                                     <div class="template-name">括号风格</div>
-                                    <div class="template-desc">一级内容用 (1.1) 格式</div>
-                                    <div class="template-preview">一、试验内容<br>   一、试验条件<br>      (1.1) 条件A<br>         - 子条件</div>
+                                    <div class="template-desc">一级内容用 (1) 格式</div>
+                                    <div class="template-preview"># Sheet页名<br>## 一、试验条件<br>### 1. 试验内容<br>(1) 条件A<br>- 子条件</div>
                                 </div>
                             </div>
                         </div>
@@ -4024,10 +4024,10 @@
                 useLegacy: false,
                 numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
                 levels: {
-                    title: { type: 'ordered', prefix: '# ', bullet: '-', indent: 0, template: '{prefix}{text}', numType: 'chinese' },
+                    title: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{prefix}# {text}' },
                     subTitle: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num}、{text}', numType: 'chinese' },
                     content1: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num}. {text}', numType: 'arabic' },
-                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}{parentNum}.{num}. {text}', numType: 'arabic' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}{num}. {text}', numType: 'arabic' },
                     content3: { type: 'unordered', prefix: '', bullet: '-', indent: 2, template: '{indent}{bullet} {text}' },
                     content4: { type: 'unordered', prefix: '', bullet: '-', indent: 3, template: '{indent}{bullet} {text}' },
                 },
@@ -4039,7 +4039,7 @@
                 useLegacy: false,
                 numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
                 levels: {
-                    title: { type: 'ordered', prefix: '# ', bullet: '-', indent: 0, template: '{prefix}{text}', numType: 'chinese' },
+                    title: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{prefix}# {text}' },
                     subTitle: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num}、{text}', numType: 'chinese' },
                     content1: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num}. {text}', numType: 'arabic' },
                     content2: { type: 'unordered', prefix: '', bullet: '-', indent: 1, template: '{indent}{bullet} {text}' },
@@ -4054,10 +4054,10 @@
                 useLegacy: false,
                 numbering: { enabled: true, separator: '.', startNum: 1, numType: 'arabic' },
                 levels: {
-                    title: { type: 'ordered', prefix: '# ', bullet: '-', indent: 0, template: '{prefix}{text}', numType: 'chinese' },
+                    title: { type: 'ordered', prefix: '', bullet: '-', indent: 0, template: '{prefix}# {text}' },
                     subTitle: { type: 'ordered', prefix: '## ', bullet: '-', indent: 0, template: '{prefix}{num}、{text}', numType: 'chinese' },
                     content1: { type: 'ordered', prefix: '### ', bullet: '-', indent: 0, template: '{prefix}{num}. {text}', numType: 'arabic' },
-                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}({parentNum}.{num}) {text}', numType: 'arabic' },
+                    content2: { type: 'ordered', prefix: '', bullet: '-', indent: 1, template: '{indent}({num}) {text}', numType: 'arabic' },
                     content3: { type: 'unordered', prefix: '', bullet: '-', indent: 2, template: '{indent}{bullet} {text}' },
                     content4: { type: 'unordered', prefix: '', bullet: '-', indent: 3, template: '{indent}{bullet} {text}' },
                 },
