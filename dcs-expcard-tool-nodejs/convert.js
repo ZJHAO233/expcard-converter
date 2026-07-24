@@ -76,14 +76,19 @@ class ExpCardConverter {
   }
 
   // 生成层级序号（如 1.1.2）
-  _generateNumber() {
+  _generateNumber(levelKey) {
     const numbering = this.OUTPUT_FORMAT.numbering;
     if (!numbering.enabled) return '';
+
+    const levels = this.OUTPUT_FORMAT.levels || {};
+    const level = levels[levelKey] || {};
 
     const parts = [];
     for (let i = 0; i < this.numberCounters.length; i++) {
       if (this.numberCounters[i] === 0 && i > 0) break;
-      parts.push(this._formatSingleNumber(this.numberCounters[i], numbering.numType));
+      // 使用层级独立的 numType，如果没有则使用全局的
+      const numType = level.numType || numbering.numType;
+      parts.push(this._formatSingleNumber(this.numberCounters[i], numType));
     }
 
     const sep = numbering.separator || '.';
@@ -163,7 +168,7 @@ class ExpCardConverter {
 
     let numStr = '';
     if (numbering.enabled && level.type === 'ordered') {
-      numStr = this._generateNumber();
+      numStr = this._generateNumber(levelKey);
     }
 
     const bullet = level.bullet || '-';
