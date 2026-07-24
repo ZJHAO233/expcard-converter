@@ -81,18 +81,29 @@ class ExpCardConverter {
     if (!numbering.enabled) return '';
 
     const levels = this.OUTPUT_FORMAT.levels || {};
-    const level = levels[levelKey] || {};
-
-    const parts = [];
-    for (let i = 0; i < this.numberCounters.length; i++) {
-      if (this.numberCounters[i] === 0 && i > 0) break;
-      // 使用层级独立的 numType，如果没有则使用全局的
-      const numType = level.numType || numbering.numType;
-      parts.push(this._formatSingleNumber(this.numberCounters[i], numType));
-    }
-
     const sep = numbering.separator || '.';
-    return parts.join(sep);
+
+    // 根据层级返回不同的序号格式
+    switch (levelKey) {
+      case 'title':
+        // 一级标题：不管，保持原样
+        return '';
+      case 'subTitle':
+        // 二级标题：中文数字（一、二、三）
+        return this._formatSingleNumber(this.numberCounters[1], 'chinese');
+      case 'content1':
+        // 一级内容：1. 2. 3.
+        return this._formatSingleNumber(this.numberCounters[2], 'arabic');
+      case 'content2':
+        // 二级内容：1.1 1.2 1.3
+        return this._formatSingleNumber(this.numberCounters[2], 'arabic') + sep + this._formatSingleNumber(this.numberCounters[3], 'arabic');
+      case 'content3':
+      case 'content4':
+        // 三级、四级内容：无序列表
+        return '';
+      default:
+        return '';
+    }
   }
 
   // 格式化单个序号
@@ -454,14 +465,14 @@ class ExpCardConverter {
 
     if (useSeqNum) {
       if (this._useCustomFormat()) {
-        this._incrementCounter(1);
+        this._incrementCounter(2);
         this.output.push(this._formatOutput('content1', content + logicStr));
       } else {
         this.output.push(this.itemCounter + ". " + content + logicStr);
       }
     } else {
       if (this._useCustomFormat()) {
-        this._incrementCounter(1);
+        this._incrementCounter(2);
         this.output.push(this._formatOutput('content1', content + logicStr));
       } else {
         this.output.push(seqNum + ". " + content + logicStr);
@@ -494,7 +505,7 @@ class ExpCardConverter {
     if (logicIsLogic) {
       if (contentVal && !contentIsLogic) {
         if (this._useCustomFormat()) {
-          this._incrementCounter(2);
+          this._incrementCounter(3);
           this.output.push(this._formatOutput('content2', contentVal));
         } else {
           this.output.push("   - " + contentVal);
@@ -515,7 +526,7 @@ class ExpCardConverter {
 
     if (content) {
       if (this._useCustomFormat()) {
-        this._incrementCounter(2);
+        this._incrementCounter(3);
         this.output.push(this._formatOutput('content2', content));
       } else {
         this.output.push("   - " + content);
