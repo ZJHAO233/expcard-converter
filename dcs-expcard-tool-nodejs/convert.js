@@ -75,12 +75,11 @@ class ExpCardConverter {
     };
   }
 
-  // 生成层级序号（如 1.1.2）
+  // 生成层级序号
   _generateNumber(levelKey) {
     const numbering = this.OUTPUT_FORMAT.numbering;
     if (!numbering.enabled) return '';
 
-    const levels = this.OUTPUT_FORMAT.levels || {};
     const sep = numbering.separator || '.';
 
     // 根据层级返回不同的序号格式
@@ -90,13 +89,13 @@ class ExpCardConverter {
         return '';
       case 'subTitle':
         // 二级标题：中文数字（一、二、三）
-        return this._formatSingleNumber(this.numberCounters[1], 'chinese');
+        return this._toChinese(this.numberCounters[1]);
       case 'content1':
         // 一级内容：1. 2. 3.
-        return this._formatSingleNumber(this.numberCounters[2], 'arabic');
+        return String(this.numberCounters[2]);
       case 'content2':
         // 二级内容：1.1 1.2 1.3
-        return this._formatSingleNumber(this.numberCounters[2], 'arabic') + sep + this._formatSingleNumber(this.numberCounters[3], 'arabic');
+        return String(this.numberCounters[2]) + sep + String(this.numberCounters[3]);
       case 'content3':
       case 'content4':
         // 三级、四级内容：无序列表
