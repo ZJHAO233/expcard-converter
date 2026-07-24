@@ -3905,8 +3905,12 @@
 
         // 打开配置面板
         settingsToggle.addEventListener('click', async () => {
-            await loadConfig();
-            renderConfigPanel();
+            try {
+                await loadConfig();
+                renderConfigPanel();
+            } catch (e) {
+                console.error('渲染配置面板失败:', e);
+            }
             configModal.style.display = 'flex';
         });
 
@@ -3953,8 +3957,12 @@
             initConfigTabs();
         }
 
-        // 初始化标签页
+        // 初始化标签页（只绑定一次）
+        let tabsInitialized = false;
         function initConfigTabs() {
+            if (tabsInitialized) return;
+            tabsInitialized = true;
+
             document.querySelectorAll('.config-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
                     // 移除所有active
