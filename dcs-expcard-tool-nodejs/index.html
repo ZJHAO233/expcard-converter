@@ -4387,6 +4387,7 @@
                 currentConfig.OUTPUT_FORMAT = JSON.parse(JSON.stringify(DEFAULT_CONFIG.OUTPUT_FORMAT));
             }
 
+            // 只同步基本设置，不覆盖 levels
             currentConfig.OUTPUT_FORMAT.useLegacy = document.getElementById('useLegacy').value === 'true';
             currentConfig.OUTPUT_FORMAT.numbering = {
                 enabled: document.getElementById('numberingEnabled').value === 'true',
@@ -4399,6 +4400,24 @@
                 size: parseInt(document.getElementById('indentSize').value) || 3,
                 char: ' '
             };
+
+            // 同步 levels 配置
+            const levels = currentConfig.OUTPUT_FORMAT.levels;
+            if (levels) {
+                for (const [key, level] of Object.entries(levels)) {
+                    const typeSelect = document.querySelector(`.level-type[data-level="${key}"]`);
+                    const numTypeSelect = document.querySelector(`.level-numType[data-level="${key}"]`);
+                    const bulletInput = document.querySelector(`.level-bullet[data-level="${key}"]`);
+                    const indentInput = document.querySelector(`.level-indent[data-level="${key}"]`);
+                    const templateInput = document.querySelector(`.level-template[data-level="${key}"]`);
+
+                    if (typeSelect) level.type = typeSelect.value;
+                    if (numTypeSelect) level.numType = numTypeSelect.value;
+                    if (bulletInput) level.bullet = bulletInput.value;
+                    if (indentInput) level.indent = parseInt(indentInput.value) || 0;
+                    if (templateInput) level.template = templateInput.value;
+                }
+            }
         }
 
         // 同步逻辑运算符到 currentConfig
