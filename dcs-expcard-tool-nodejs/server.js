@@ -57,12 +57,12 @@ function getDefaultConfig() {
       useLegacy: true,
       numbering: { enabled: false, separator: ".", startNum: 1, numType: "arabic" },
       levels: {
-        title: { type: "ordered", prefix: "## ", bullet: "-", indent: 0, template: "{prefix}{num} {text}" },
-        subTitle: { type: "ordered", prefix: "### ", bullet: "-", indent: 0, template: "{prefix}{num} {text}" },
-        content1: { type: "ordered", prefix: "", bullet: "-", indent: 0, template: "{indent}{num} {text}" },
-        content2: { type: "ordered", prefix: "", bullet: "-", indent: 1, template: "{indent}{num} {text}" },
+        title: { type: "ordered", prefix: "", bullet: "-", indent: 0, template: "{prefix}# {text}", numType: "chinese" },
+        subTitle: { type: "ordered", prefix: "## ", bullet: "-", indent: 0, template: "{prefix}{num}、{text}", numType: "chinese" },
+        content1: { type: "ordered", prefix: "### ", bullet: "-", indent: 0, template: "{prefix}{num}. {text}", numType: "arabic" },
+        content2: { type: "ordered", prefix: "", bullet: "-", indent: 1, template: "{indent}{num}. {text}", numType: "arabic" },
         content3: { type: "unordered", prefix: "", bullet: "-", indent: 2, template: "{indent}{bullet} {text}" },
-        content4: { type: "unordered", prefix: "", bullet: "*", indent: 3, template: "{indent}{bullet} {text}" },
+        content4: { type: "unordered", prefix: "", bullet: "-", indent: 3, template: "{indent}{bullet} {text}" },
       },
       indent: { size: 3, char: " " }
     },
