@@ -178,9 +178,9 @@ const EXPCARD_CONFIG = {
   // ========================================================================
   OUTPUT_FORMAT: {
 
-    // 是否使用原有格式（默认 true，不启用自定义格式）
-    // 设为 false 后可自定义输出格式
-    useLegacy: true,
+    // 是否使用原有格式（默认 false，启用自定义格式）
+    // 设为 true 后使用原有输出格式
+    useLegacy: false,
 
     // 序号设置（仅在 useLegacy: false 时生效）
     numbering: {
@@ -189,6 +189,74 @@ const EXPCARD_CONFIG = {
       startNum: 1,                // 起始序号
       numType: "arabic",          // arabic(1,2,3) / roman(I,II,III) / chinese(一,二,三)
     },
+
+    // 各层级格式配置
+    levels: {
+      // 一级标题（保持原样，来自Excel）
+      title: {
+        type: "ordered",         // ordered(有序) / unordered(无序)
+        prefix: "",              // 不添加前缀
+        bullet: "-",             // 无序列表符号
+        indent: 0,               // 缩进级别
+        template: "{prefix}{text}",
+        numType: "chinese",      // 中文数字
+      },
+
+      // 二级标题（中文数字+顿号，如"一、试验条件"）
+      subTitle: {
+        type: "ordered",
+        prefix: "## ",
+        bullet: "-",
+        indent: 0,
+        template: "{prefix}{num}、{text}",
+        numType: "chinese",
+      },
+
+      // 三级标题/一级内容（纯数字+点，如"1. 试验内容"）
+      content1: {
+        type: "ordered",
+        prefix: "### ",
+        bullet: "-",
+        indent: 0,
+        template: "{prefix}{num}. {text}",
+        numType: "arabic",
+      },
+
+      // 二级内容（子编号，如"1.1 条件A"）
+      content2: {
+        type: "ordered",
+        prefix: "",
+        bullet: "-",
+        indent: 1,
+        template: "{indent}{num}. {text}",
+        numType: "arabic",
+      },
+
+      // 三级内容（无序列表）
+      content3: {
+        type: "unordered",
+        prefix: "",
+        bullet: "-",
+        indent: 2,
+        template: "{indent}{bullet} {text}",
+      },
+
+      // 四级内容（无序列表）
+      content4: {
+        type: "unordered",
+        prefix: "",
+        bullet: "-",
+        indent: 3,
+        template: "{indent}{bullet} {text}",
+      },
+    },
+
+    // 缩进设置
+    indent: {
+      size: 3,                    // 每级缩进空格数
+      char: " ",                  // 缩进字符（空格或制表符）
+    },
+  },
 
     // 各层级格式配置
     levels: {

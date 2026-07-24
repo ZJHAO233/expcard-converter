@@ -54,10 +54,10 @@ function getDefaultConfig() {
       skipSectionStart: { type: "exact", values: ["试验条件"] },
     },
     OUTPUT_FORMAT: {
-      useLegacy: true,
-      numbering: { enabled: false, separator: ".", startNum: 1, numType: "arabic" },
+      useLegacy: false,
+      numbering: { enabled: true, separator: ".", startNum: 1, numType: "arabic" },
       levels: {
-        title: { type: "ordered", prefix: "", bullet: "-", indent: 0, template: "{prefix}# {text}", numType: "chinese" },
+        title: { type: "ordered", prefix: "", bullet: "-", indent: 0, template: "{prefix}{text}", numType: "chinese" },
         subTitle: { type: "ordered", prefix: "## ", bullet: "-", indent: 0, template: "{prefix}{num}、{text}", numType: "chinese" },
         content1: { type: "ordered", prefix: "### ", bullet: "-", indent: 0, template: "{prefix}{num}. {text}", numType: "arabic" },
         content2: { type: "ordered", prefix: "", bullet: "-", indent: 1, template: "{indent}{num}. {text}", numType: "arabic" },
